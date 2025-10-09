@@ -1,0 +1,34 @@
+**clone this project
+
+--version tools 
+PHP 8.2.12
+composer 2.8.12
+node 22.20.0
+npm 11.5.2
+
+--clone bash
+composser install
+npm install
+npm run dev
+
+
+**git 
+
+--reminder
+".gitinore"
+
+--global
+git config --global user.name ""
+git config --global user.email ""
+
+--local
+git config user.name ""
+git config user.email "@gmail.com"
+
+--utilities
+git log, check log
+git status, recheck repo
+git add . 
+git add 'directory'
+git commit -m ""
+git push origin main
