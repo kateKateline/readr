@@ -91,43 +91,69 @@
 </head>
 <body class="bg-gray-50">
     <!-- Enhanced Navbar -->
-    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-black text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <span class="text-3xl font-manga font-bold tracking-wider">READR</span>
-                </div>
-
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#home" class="hover:text-purple-400 transition-colors duration-200 font-medium">Home</a>
-                    <a href="#features" class="hover:text-purple-400 transition-colors duration-200 font-medium">Features</a>
-                    <a href="#library" class="hover:text-purple-400 transition-colors duration-200 font-medium">Library</a>
-                    <a href="#community" class="hover:text-purple-400 transition-colors duration-200 font-medium">Community</a>
-                    <a href="#" class=" hover:shadow-lg hover:text-purple-400 duration-200 font-medium">Sign Up</a>
-                </div>
-
-                <!-- Mobile Menu Button -->
-                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
+<nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-black text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <span class="text-3xl font-manga font-bold tracking-wider">READR</span>
             </div>
-        </div>
 
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-black border-t border-gray-800">
-            <div class="px-4 py-4 space-y-3">
-                <a href="#home" class="block py-2 hover:text-purple-400 transition-colors">Home</a>
-                <a href="#features" class="block py-2 hover:text-purple-400 transition-colors">Features</a>
-                <a href="#library" class="block py-2 hover:text-purple-400 transition-colors">Library</a>
-                <a href="#community" class="block py-2 hover:text-purple-400 transition-colors">Community</a>
-                <a href="#" class="block py-2 hover:text-purple-400 transition-colors">Sign Up</a>
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#home" class="hover:text-purple-400 transition-colors duration-200 font-medium">Home</a>
+                <a href="#features" class="hover:text-purple-400 transition-colors duration-200 font-medium">Features</a>
+                <a href="#library" class="hover:text-purple-400 transition-colors duration-200 font-medium">Library</a>
+                <a href="#community" class="hover:text-purple-400 transition-colors duration-200 font-medium">Community</a>
+
+                @if(Session::has('user'))
+                    <!-- Jika user sudah login -->
+                    <div class="flex items-center space-x-3">
+                        <img src="{{ asset('images/' . Session::get('user')->profile) }}" 
+                             alt="Profile" 
+                             class="w-8 h-8 rounded-full border border-gray-500">
+                        <span class="font-medium">{{ Session::get('user')->username }}</span>
+                        <a href="{{ route('logout') }}" class="hover:text-red-400 transition-colors">Logout</a>
+                    </div>
+                @else
+                    <!-- Jika user belum login -->
+                    <a href="{{ route('signup.form') }}" class="hover:text-purple-400 duration-200 font-medium">Sign Up</a>
+                @endif
             </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
         </div>
-    </nav>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-black border-t border-gray-800">
+        <div class="px-4 py-4 space-y-3">
+            <a href="#home" class="block py-2 hover:text-purple-400 transition-colors">Home</a>
+            <a href="#features" class="block py-2 hover:text-purple-400 transition-colors">Features</a>
+            <a href="#library" class="block py-2 hover:text-purple-400 transition-colors">Library</a>
+            <a href="#community" class="block py-2 hover:text-purple-400 transition-colors">Community</a>
+
+            @if(Session::has('user'))
+                <div class="flex items-center space-x-3">
+                    <img src="{{ asset('images/' . Session::get('user')->profile) }}" 
+                         alt="Profile" 
+                         class="w-8 h-8 rounded-full border border-gray-500">
+                    <span>{{ Session::get('user')->username }}</span>
+                    <a href="{{ route('logout') }}" class="block py-2 hover:text-red-400">Logout</a>
+                </div>
+            @else
+                <a href="{{ route('signup.form') }}" class="block py-2 hover:text-purple-400 transition-colors">Sign Up</a>
+            @endif
+        </div>
+    </div>
+</nav>
+
     
 <!-- Features Section -->
 <section id="features" class="py-20 bg-white">
