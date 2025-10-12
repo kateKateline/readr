@@ -12,7 +12,10 @@ npm install
 npm run dev
 
 
-**git 
+**git
+
+--setup
+git init
 
 --reminder
 ".gitinore"
@@ -42,3 +45,11 @@ DB_USERNAME=root
 DB_PASSWORD=
 
 session=file
+
+
+
+**ntmy
+incognito
+history
+change acc
+safe search

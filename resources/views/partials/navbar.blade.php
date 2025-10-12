@@ -6,7 +6,7 @@
             </div>
 
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#home" class="hover:text-purple-400 transition-colors duration-200 font-medium">Home</a>
+                <a href="{{ route('home') }}" class="hover:text-purple-400 transition-colors duration-200 font-medium">Home</a>
                 <a href="#features" class="hover:text-purple-400 transition-colors duration-200 font-medium">Features</a>
                 <a href="#library" class="hover:text-purple-400 transition-colors duration-200 font-medium">Library</a>
                 <a href="#community" class="hover:text-purple-400 transition-colors duration-200 font-medium">Community</a>

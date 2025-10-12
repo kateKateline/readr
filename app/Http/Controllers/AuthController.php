@@ -69,7 +69,7 @@ class AuthController extends Controller
         return redirect()->route('signin.form')->with('error', 'Please login first.');
     }
 
-    return view('auth.profile', compact('user'));
+    return view('pages.profile', compact('user'));
 }
 
 
