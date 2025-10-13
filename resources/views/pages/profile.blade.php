@@ -47,15 +47,15 @@
                     <!-- Stats -->
                     <div class="flex gap-12 mb-6">
                         <div>
-                            <p class="text-4xl font-bold text-gray-900">24</p>
+                            <p class="text-4xl font-bold text-gray-900">{{ $user->favorites->count() }}</p>
                             <p class="text-sm text-gray-600 mt-1">Favorites</p>
                         </div>
                         <div>
-                            <p class="text-4xl font-bold text-gray-900">12</p>
+                            <p class="text-4xl font-bold text-gray-900">{{ $user->bookmarks->count() }}</p>
                             <p class="text-sm text-gray-600 mt-1">Bookmarks</p>
                         </div>
                         <div>
-                            <p class="text-4xl font-bold text-gray-900">156</p>
+                            <p class="text-4xl font-bold text-gray-900">0</p>
                             <p class="text-sm text-gray-600 mt-1">Following</p>
                         </div>
                     </div>
@@ -94,10 +94,10 @@
                     </a>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    @forelse(range(1,3) as $i)
+                    @forelse($user->favorites as $fav)
                     <div class="group border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition-all duration-300 cursor-pointer">
                         <div class="relative overflow-hidden">
-                            <img src="https://via.placeholder.com/300x150" alt="Favorite" class="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500">
+                            <img src="{{ $fav->comic->cover_image ?? 'https://via.placeholder.com/300x150' }}" alt="Favorite" class="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             <div class="absolute top-3 right-3">
                                 <button class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all">
@@ -108,8 +108,8 @@
                             </div>
                         </div>
                         <div class="p-4">
-                            <p class="font-semibold text-gray-900 group-hover:text-purple-600 transition">Favorite Item {{ $i }}</p>
-                            <p class="text-sm text-gray-500 mt-1">Lorem ipsum dolor sit amet</p>
+                            <p class="font-semibold text-gray-900 group-hover:text-purple-600 transition">{{ $fav->comic->title ?? 'Untitled' }}</p>
+                            <p class="text-sm text-gray-500 mt-1">{{ \Illuminate\Support\Str::limit($fav->comic->synopsis ?? 'No description', 60) }}</p>
                         </div>
                     </div>
                     @empty
@@ -141,10 +141,10 @@
                     </a>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    @forelse(range(1,2) as $i)
+                    @forelse($user->bookmarks as $bm)
                     <div class="group border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition-all duration-300 cursor-pointer">
                         <div class="relative overflow-hidden">
-                            <img src="https://via.placeholder.com/300x150" alt="Bookmark" class="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500">
+                            <img src="{{ $bm->comic->cover_image ?? 'https://via.placeholder.com/300x150' }}" alt="Bookmark" class="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             <div class="absolute top-3 right-3">
                                 <button class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all">
@@ -155,8 +155,8 @@
                             </div>
                         </div>
                         <div class="p-4">
-                            <p class="font-semibold text-gray-900 group-hover:text-purple-600 transition">Bookmarked Item {{ $i }}</p>
-                            <p class="text-sm text-gray-500 mt-1">Saved for later reading</p>
+                            <p class="font-semibold text-gray-900 group-hover:text-purple-600 transition">{{ $bm->comic->title ?? 'Untitled' }}</p>
+                            <p class="text-sm text-gray-500 mt-1">{{ \Illuminate\Support\Str::limit($bm->comic->synopsis ?? 'No description', 60) }}</p>
                         </div>
                     </div>
                     @empty

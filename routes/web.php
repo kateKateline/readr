@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,3 +29,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Profile Route
 Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
+
+
+Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('profile.show');
+
