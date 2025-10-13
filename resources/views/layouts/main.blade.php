@@ -6,7 +6,6 @@
     <title>@yield('title', 'Readr')</title>
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
     @vite(['resources/css/app.css', 'resources/css/landing.css'])
-    @vite('resources/css/app.css')
     @vite('resources/js/app.js')
 </head>
 
