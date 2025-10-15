@@ -4,14 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-| Semua route web aplikasi kamu didaftarkan di sini.
-| File ini akan otomatis dimuat oleh RouteServiceProvider.
-|--------------------------------------------------------------------------
-*/
+
 
 // Halaman utama
 Route::get('/', function () {
