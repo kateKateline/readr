@@ -93,37 +93,26 @@
                         </svg>
                     </a>    
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
                     @forelse($user->favorites as $fav)
-                    <div class="group border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition-all duration-300 cursor-pointer">
-                        <div class="relative overflow-hidden">
-                            <img src="{{ $fav->comic->cover_image ? asset('images/' . $fav->comic->cover_image) : 'https://via.placeholder.com/300x450' }}" 
+                    <div class="group cursor-pointer">
+                        <div class="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
+                            <img src="{{ $fav->comic->cover_image ? asset('images/' . $fav->comic->cover_image) : 'https://via.placeholder.com/200x280' }}" 
                                  alt="{{ $fav->comic->title }}" 
-                                 class="w-full h-130 object-cover group-hover:scale-105 transition-transform duration-500">
-
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <div class="absolute top-3 right-3">
-                                <button class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all">
-                                    <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-                                    </svg>
-                                </button>
-                            </div>
+                                 class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                         </div>
-                        <div class="p-4">
-                            <p class="font-semibold text-gray-900 group-hover:text-purple-600 transition">{{ $fav->comic->title ?? 'Untitled' }}</p>
-                            <p class="text-sm text-gray-500 mt-1">{{ \Illuminate\Support\Str::limit($fav->comic->synopsis ?? 'No description', 60) }}</p>
-                        </div>
+                        <p class="mt-2 text-sm font-medium text-gray-800 text-center line-clamp-2">{{ $fav->comic->title ?? 'Untitled' }}</p>
                     </div>
                     @empty
-                    <div class="col-span-3 text-center py-12 text-gray-400">
+                    <div class="col-span-2 sm:col-span-4 md:col-span-6 text-center py-12 text-gray-400">
                         <svg class="w-20 h-20 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
                         <p class="text-lg font-medium">No favorites yet</p>
                         <p class="text-sm mt-1">Start adding items you love!</p>
                     </div>
-                    @endforelse
+                    @endforelse 
                 </div>
             </div>
 
@@ -143,27 +132,19 @@
                         </svg>
                     </a>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
                     @forelse($user->bookmarks as $bm)
-                    <div class="group border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition-all duration-300 cursor-pointer">
-                        <div class="relative overflow-hidden">
-                            <img src="{{ $bm->comic->cover_image ?? 'https://via.placeholder.com/300x150' }}" alt="Bookmark" class="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <div class="absolute top-3 right-3">
-                                <button class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all">
-                                    <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/>
-                                    </svg>
-                                </button>
-                            </div>
+                    <div class="group cursor-pointer">
+                        <div class="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
+                            <img src="{{ $bm->comic->cover_image ? asset('images/' . $bm->comic->cover_image) : 'https://via.placeholder.com/200x280' }}" 
+                                 alt="{{ $bm->comic->title }}" 
+                                 class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                         </div>
-                        <div class="p-4">
-                            <p class="font-semibold text-gray-900 group-hover:text-purple-600 transition">{{ $bm->comic->title ?? 'Untitled' }}</p>
-                            <p class="text-sm text-gray-500 mt-1">{{ \Illuminate\Support\Str::limit($bm->comic->synopsis ?? 'No description', 60) }}</p>
-                        </div>
+                        <p class="mt-2 text-sm font-medium text-gray-800 text-center line-clamp-2">{{ $bm->comic->title ?? 'Untitled' }}</p>
                     </div>
                     @empty
-                    <div class="col-span-3 text-center py-12 text-gray-400">
+                    <div class="col-span-2 sm:col-span-4 md:col-span-6 text-center py-12 text-gray-400">
                         <svg class="w-20 h-20 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
                         </svg>
