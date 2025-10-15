@@ -91,13 +91,16 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                         </svg>
-                    </a>
+                    </a>    
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     @forelse($user->favorites as $fav)
                     <div class="group border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition-all duration-300 cursor-pointer">
                         <div class="relative overflow-hidden">
-                            <img src="{{ $fav->comic->cover_image ?? 'https://via.placeholder.com/300x150' }}" alt="Favorite" class="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500">
+                            <img src="{{ $fav->comic->cover_image ? asset('images/' . $fav->comic->cover_image) : 'https://via.placeholder.com/300x450' }}" 
+                                 alt="{{ $fav->comic->title }}" 
+                                 class="w-full h-130 object-cover group-hover:scale-105 transition-transform duration-500">
+
                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             <div class="absolute top-3 right-3">
                                 <button class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all">
