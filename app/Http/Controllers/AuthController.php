@@ -35,32 +35,53 @@ class AuthController extends Controller
     }
 
     // Menampilkan halaman signin
-    public function showSigninForm() {
-        return view('auth.signin');
+public function showSigninForm()
+{
+    // Jika sudah login, arahkan sesuai role
+    if (Session::has('user_id')) {
+        $user = \App\Models\User::find(Session::get('user_id'));
+
+        if ($user) {
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+            return redirect()->route('home');
+        }
     }
 
-    // Proses signin (login)
-    public function signin(Request $request) {
+    // Jika belum login, tampilkan halaman login
+    return view('auth.signin');
+}
+
+    
+        // Proses signin (login)
+    public function signin(Request $request)
+    {
         $request->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
-
-        //  Ambil user berdasarkan email menggunakan Eloquent
+    
         $user = User::where('email', $request->email)->first();
-
+    
         if ($user && Hash::check($request->password, $user->password)) {
             Session::put('user_id', $user->id);
-            return redirect('/')->with('success', 'Welcome back, ' . $user->username . '!');
+        
+            // Cek role user dan arahkan sesuai
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard')->with('success', 'Welcome back, Admin!');
+            }
+        
+            return redirect()->route('home')->with('success', 'Welcome back, ' . $user->username . '!');
         }
-
+    
         return back()->with('error', 'Invalid email or password.');
     }
-
+    
     // Logout user
     public function logout() {
-        Session::forget('user_id');
-        return redirect('/')->with('success', 'You have been logged out.');
+    Session::forget('user_id');
+    return redirect('/')->with('success', 'You have been logged out.');
     }
 
     public function profile() {

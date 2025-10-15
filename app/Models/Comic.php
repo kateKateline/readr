@@ -14,7 +14,6 @@ class Comic extends Model
     protected $fillable = [
         'title',
         'author',
-        'genre',
         'type',
         'status',
         'age_rating',
@@ -24,17 +23,17 @@ class Comic extends Model
         'chapters',
         'rating',
         'rank',
-        'created_at',
-        'updated_at',
     ];
 
     public $timestamps = true; // karena kamu punya created_at & updated_at
 
+    // Relasi ke tabel favorites
     public function favorites()
     {
         return $this->hasMany(Favorite::class);
     }
 
+    // Relasi ke tabel bookmarks
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class);
