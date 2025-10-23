@@ -91,77 +91,182 @@
         <div class="slider-dot" onclick="goToSlide(2)"></div>
     </div>
 </section>
-    <div class="mb-8">
-        <form action="{{ route('landing') }}" method="GET" class="flex gap-2">
-            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari judul / author..." class="flex-1 border rounded px-3 py-2">
-            <select name="sort" class="border rounded px-2 py-2">
+
+<!-- Top Rankings Section -->
+@if($topRank->count() > 0)
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <h3 class="text-2xl sm:text-3xl font-bold text-[#3E5F44] mb-6 sm:mb-8 text-center">📊 Peringkat Teratas</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        @foreach($topRank->take(4) as $index => $comic)
+        <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 card-hover @if($index === 0) border-t-4 border-[#3E5F44] @elseif($index === 1) border-t-4 border-[#5E936C] @elseif($index === 2) border-t-4 border-[#93DA97] @endif">
+            <div class="flex items-center mb-4">
+                <span class="text-3xl sm:text-4xl font-bold @if($index === 0) text-[#3E5F44] @elseif($index === 1) text-[#5E936C] @else text-gray-400 @endif mr-2 sm:mr-3">{{ $comic->rank }}</span>
+                <img src="{{ asset('storage/covers/'.$comic->cover_image) }}" alt="{{ $comic->title }}" class="w-12 h-16 sm:w-16 sm:h-20 object-cover rounded">
+                <div class="ml-2 sm:ml-3 flex-1">
+                    <h4 class="font-semibold text-gray-800 text-sm sm:text-base">{{ Str::limit($comic->title, 20) }}</h4>
+                    <p class="text-xs sm:text-sm text-gray-500">Chapter {{ $comic->chapters }}</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-between text-xs sm:text-sm">
+                <span class="text-gray-600">⭐ {{ $comic->rating }}/10</span>
+                <span class="text-[#5E936C] font-semibold">{{ $comic->type }}</span>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</section>
+@endif
+
+<!-- Popular Manga Section -->
+@if($mangaPopular->count() > 0)
+<section class="bg-white py-12 sm:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h3 class="text-2xl sm:text-3xl font-bold text-[#3E5F44] mb-6 sm:mb-8">🇯🇵 Manga Populer</h3>
+        <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
+            @foreach($mangaPopular as $comic)
+            <div class="card-hover cursor-pointer">
+                <img src="{{ asset('storage/covers/'.$comic->cover_image) }}" alt="{{ $comic->title }}" class="bg-gradient-to-br from-[#93DA97] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md w-full object-cover" style="aspect-ratio: 2/3;">
+                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">{{ Str::limit($comic->title, 25) }}</h4>
+                <p class="text-xs sm:text-sm text-gray-500">Ch {{ $comic->chapters }}</p>
+                <p class="text-xs text-yellow-600 mt-1">⭐ {{ $comic->rating }}</p>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+<!-- Popular Manhwa Section -->
+@if($manhwaPopular->count() > 0)
+<section class="py-12 sm:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h3 class="text-2xl sm:text-3xl font-bold text-[#3E5F44] mb-6 sm:mb-8">🇰🇷 Manhwa Populer</h3>
+        <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
+            @foreach($manhwaPopular as $comic)
+            <div class="card-hover cursor-pointer">
+                <img src="{{ asset('storage/covers/'.$comic->cover_image) }}" alt="{{ $comic->title }}" class="bg-gradient-to-br from-[#5E936C] to-[#3E5F44] rounded-lg mb-2 sm:mb-3 shadow-md w-full object-cover" style="aspect-ratio: 2/3;">
+                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">{{ Str::limit($comic->title, 25) }}</h4>
+                <p class="text-xs sm:text-sm text-gray-500">Ch {{ $comic->chapters }}</p>
+                <p class="text-xs text-yellow-600 mt-1">⭐ {{ $comic->rating }}</p>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+<!-- Popular Manhua Section -->
+@if($manhuaPopular->count() > 0)
+<section class="bg-white py-12 sm:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h3 class="text-2xl sm:text-3xl font-bold text-[#3E5F44] mb-6 sm:mb-8">🇨🇳 Manhua Populer</h3>
+        <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
+            @foreach($manhuaPopular as $comic)
+            <div class="card-hover cursor-pointer">
+                <img src="{{ asset('storage/covers/'.$comic->cover_image) }}" alt="{{ $comic->title }}" class="bg-gradient-to-br from-[#3E5F44] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md w-full object-cover" style="aspect-ratio: 2/3;">
+                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">{{ Str::limit($comic->title, 25) }}</h4>
+                <p class="text-xs sm:text-sm text-gray-500">Ch {{ $comic->chapters }}</p>
+                <p class="text-xs text-yellow-600 mt-1">⭐ {{ $comic->rating }}</p>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+<!-- Latest Updates Section -->
+@if($latest->count() > 0)
+<section class="py-12 sm:py-16 bg-gradient-to-b from-[#E8FFD7] to-[#93DA97]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h3 class="text-2xl sm:text-3xl font-bold text-[#3E5F44] mb-6 sm:mb-8 text-center">📚 Update Terbaru</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            @foreach($latest->take(6) as $comic)
+            <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 card-hover">
+                <div class="flex items-start space-x-3 sm:space-x-4">
+                    <img src="{{ asset('storage/covers/'.$comic->cover_image) }}" alt="{{ $comic->title }}" class="w-16 h-24 sm:w-20 sm:h-28 object-cover rounded flex-shrink-0">
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-800 mb-1 sm:mb-2 text-sm sm:text-base">{{ Str::limit($comic->title, 30) }}</h4>
+                        <p class="text-xs sm:text-sm text-gray-600 mb-2">Chapter {{ $comic->chapters }} - {{ $comic->type }}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500">{{ $comic->created_at->diffForHumans() }}</span>
+                            <span class="bg-[#3E5F44] text-white text-xs px-2 sm:px-3 py-1 rounded-full">NEW</span>
+                        </div>
+                        <p class="text-xs text-yellow-600 mt-2">⭐ {{ $comic->rating }}</p>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        <div class="text-center mt-6 sm:mt-8">
+            <button class="bg-[#3E5F44] text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold hover:bg-[#5E936C] transition text-sm sm:text-base">
+                Lihat Semua Update
+            </button>
+        </div>
+    </div>
+</section>
+@endif
+
+<!-- All Comics Section (with Search) -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h3 class="text-2xl sm:text-3xl font-bold text-[#3E5F44] mb-6">📖 Semua Komik</h3>
+    
+    <!-- Search & Filter -->
+    <div class="mb-8 bg-white rounded-lg shadow-md p-4">
+        <form action="{{ route('landing') }}" method="GET" class="flex flex-col sm:flex-row gap-3">
+            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari judul / author..." class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E5F44] focus:border-transparent">
+            <select name="type" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E5F44]">
+                <option value="">Semua Type</option>
+                <option value="Manga" {{ request('type')=='Manga' ? 'selected' : '' }}>Manga</option>
+                <option value="Manhwa" {{ request('type')=='Manhwa' ? 'selected' : '' }}>Manhwa</option>
+                <option value="Manhua" {{ request('type')=='Manhua' ? 'selected' : '' }}>Manhua</option>
+            </select>
+            <select name="sort" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#3E5F44]">
                 <option value="">Sort: Latest</option>
                 <option value="rank" {{ request('sort')=='rank' ? 'selected' : '' }}>Rank</option>
                 <option value="rating" {{ request('sort')=='rating' ? 'selected' : '' }}>Rating</option>
             </select>
-            <button class="bg-blue-600 text-white px-4 py-2 rounded">Cari</button>
+            <button class="bg-[#3E5F44] text-white px-6 py-2 rounded-lg hover:bg-[#5E936C] transition font-semibold">Cari</button>
         </form>
     </div>
 
-    {{-- Top Rank --}}
-    <section class="mb-10">
-        <h2 class="text-xl font-bold mb-4">Top Rank</h2>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-            @foreach($topRank as $comic)
-                <div class="bg-white rounded shadow p-2 text-center">
-                    <img src="{{ asset('storage/covers/'.$comic->cover_image) }}" alt="{{ $comic->title }}" class="w-full h-40 object-cover rounded">
-                    <h3 class="text-sm font-semibold mt-2">{{ Str::limit($comic->title, 30) }}</h3>
-                    <p class="text-xs text-gray-500">Rank #{{ $comic->rank }}</p>
-                </div>
-            @endforeach
-        </div>
-    </section>
-
-    {{-- Top Rated --}}
-    <section class="mb-10">
-        <h2 class="text-xl font-bold mb-4">Top Rated</h2>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-            @foreach($topRated as $comic)
-                <div class="bg-white rounded shadow p-2 text-center">
-                    <img src="{{ asset('storage/covers/'.$comic->cover_image) }}" alt="{{ $comic->title }}" class="w-full h-40 object-cover rounded">
-                    <h3 class="text-sm font-semibold mt-2">{{ Str::limit($comic->title, 30) }}</h3>
-                    <p class="text-xs text-gray-500">Rating: {{ $comic->rating }}</p>
-                </div>
-            @endforeach
-        </div>
-    </section>
-
-    {{-- Latest --}}
-    <section class="mb-10">
-        <h2 class="text-xl font-bold mb-4">Latest</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            @foreach($latest as $comic)
-                <x-comic-card :comic="$comic" />
-            @endforeach
-        </div>
-    </section>
-
-    {{-- Main listing (paginated) --}}
-    <section class="mb-10">
-        <h2 class="text-xl font-bold mb-4">All Comics</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            @foreach($comics as $comic)
-                <div class="bg-white rounded shadow p-4">
-                    <div class="flex gap-4">
-                        <img src="{{ asset('storage/covers/'.$comic->cover_image) }}" alt="{{ $comic->title }}" class="w-24 h-32 object-cover rounded">
-                        <div>
-                            <h3 class="font-semibold">{{ $comic->title }}</h3>
-                            <p class="text-sm text-gray-600">{{ $comic->author }}</p>
-                            <p class="text-xs text-gray-500 mt-2">Type: {{ $comic->type }} • Status: {{ $comic->status }}</p>
-                            <p class="text-xs text-gray-500">Ch: {{ $comic->chapters }} • Rating: {{ $comic->rating }}</p>
-                        </div>
+    @if($comics->count() > 0)
+    <!-- Comics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach($comics as $comic)
+        <div class="bg-white rounded-lg shadow-lg hover:shadow-xl transition p-4 card-hover">
+            <div class="flex gap-4">
+                <img src="{{ asset('storage/covers/'.$comic->cover_image) }}" alt="{{ $comic->title }}" class="w-24 h-32 object-cover rounded flex-shrink-0">
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">{{ $comic->title }}</h3>
+                    <p class="text-sm text-gray-600 mb-2">{{ $comic->author }}</p>
+                    <div class="space-y-1">
+                        <p class="text-xs text-gray-500">
+                            <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded">{{ $comic->type }}</span>
+                            <span class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded ml-1">{{ $comic->status }}</span>
+                        </p>
+                        <p class="text-xs text-gray-500">📖 {{ $comic->chapters }} Chapters</p>
+                        <p class="text-xs text-yellow-600">⭐ {{ $comic->rating }}/10</p>
+                        @if($comic->rank)
+                        <p class="text-xs text-purple-600 font-semibold">🏆 Rank #{{ $comic->rank }}</p>
+                        @endif
                     </div>
                 </div>
-            @endforeach
+            </div>
         </div>
+        @endforeach
+    </div>
 
-        <div class="mt-6">
-            {{ $comics->links() }}
-        </div>
-    </section>
+    <!-- Pagination -->
+    <div class="mt-8">
+        {{ $comics->links() }}
+    </div>
+    @else
+    <!-- Empty State -->
+    <div class="text-center py-12">
+        <div class="text-6xl mb-4">😔</div>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">Tidak ada hasil ditemukan</h3>
+        <p class="text-gray-500">Coba kata kunci yang berbeda atau <a href="{{ route('landing') }}" class="text-[#3E5F44] hover:underline font-semibold">lihat semua komik</a></p>
+    </div>
+    @endif
+</section>
 @endsection
