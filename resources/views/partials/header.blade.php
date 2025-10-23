@@ -13,6 +13,7 @@
                     <button class="bg-[#3E5F44] text-white px-4 sm:px-6 py-2 rounded-full hover:bg-[#5E936C] transition text-sm sm:text-base">
                         Login
                     </button>
+                    <a href="{{ route('logout.get') }}" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">test</a>
                 </div>
             </div>
         </div>
