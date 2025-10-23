@@ -91,223 +91,77 @@
         <div class="slider-dot" onclick="goToSlide(2)"></div>
     </div>
 </section>
-<!-- Top Rankings -->
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-    <h3 class="text-2xl sm:text-3xl font-bold text-[#3E5F44] mb-6 sm:mb-8 text-center">📊 Peringkat Teratas</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <!-- Rank 1 -->
-        <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 card-hover border-t-4 border-[#3E5F44]">
-            <div class="flex items-center mb-4">
-                <span class="text-3xl sm:text-4xl font-bold text-[#3E5F44] mr-2 sm:mr-3">1</span>
-                <div class="w-12 h-16 sm:w-16 sm:h-20 bg-gradient-to-br from-[#93DA97] to-[#5E936C] rounded"></div>
-                <div class="ml-2 sm:ml-3">
-                    <h4 class="font-semibold text-gray-800 text-sm sm:text-base">One Piece</h4>
-                    <p class="text-xs sm:text-sm text-gray-500">Chapter 1095</p>
-                </div>
-            </div>
-            <div class="flex items-center justify-between text-xs sm:text-sm">
-                <span class="text-gray-600">⭐ 9.8/10</span>
-                <span class="text-[#5E936C] font-semibold">125M views</span>
-            </div>
-        </div>
-        <!-- Rank 2 -->
-        <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 card-hover border-t-4 border-[#5E936C]">
-            <div class="flex items-center mb-4">
-                <span class="text-3xl sm:text-4xl font-bold text-[#5E936C] mr-2 sm:mr-3">2</span>
-                <div class="w-12 h-16 sm:w-16 sm:h-20 bg-gradient-to-br from-[#93DA97] to-[#5E936C] rounded"></div>
-                <div class="ml-2 sm:ml-3">
-                    <h4 class="font-semibold text-gray-800 text-sm sm:text-base">Solo Leveling</h4>
-                    <p class="text-xs sm:text-sm text-gray-500">Chapter 200</p>
-                </div>
-            </div>
-            <div class="flex items-center justify-between text-xs sm:text-sm">
-                <span class="text-gray-600">⭐ 9.7/10</span>
-                <span class="text-[#5E936C] font-semibold">98M views</span>
-            </div>
-        </div>
-        <!-- Rank 3 -->
-        <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 card-hover border-t-4 border-[#93DA97]">
-            <div class="flex items-center mb-4">
-                <span class="text-3xl sm:text-4xl font-bold text-[#5E936C] mr-2 sm:mr-3">3</span>
-                <div class="w-12 h-16 sm:w-16 sm:h-20 bg-gradient-to-br from-[#93DA97] to-[#5E936C] rounded"></div>
-                <div class="ml-2 sm:ml-3">
-                    <h4 class="font-semibold text-gray-800 text-sm sm:text-base">Jujutsu Kaisen</h4>
-                    <p class="text-xs sm:text-sm text-gray-500">Chapter 245</p>
-                </div>
-            </div>
-            <div class="flex items-center justify-between text-xs sm:text-sm">
-                <span class="text-gray-600">⭐ 9.6/10</span>
-                <span class="text-[#5E936C] font-semibold">87M views</span>
-            </div>
-        </div>
-        <!-- Rank 4 -->
-        <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 card-hover">
-            <div class="flex items-center mb-4">
-                <span class="text-3xl sm:text-4xl font-bold text-gray-400 mr-2 sm:mr-3">4</span>
-                <div class="w-12 h-16 sm:w-16 sm:h-20 bg-gradient-to-br from-[#93DA97] to-[#5E936C] rounded"></div>
-                <div class="ml-2 sm:ml-3">
-                    <h4 class="font-semibold text-gray-800 text-sm sm:text-base">Tower of God</h4>
-                    <p class="text-xs sm:text-sm text-gray-500">Chapter 580</p>
-                </div>
-            </div>
-            <div class="flex items-center justify-between text-xs sm:text-sm">
-                <span class="text-gray-600">⭐ 9.5/10</span>
-                <span class="text-[#5E936C] font-semibold">76M views</span>
-            </div>
-        </div>
+    <div class="mb-8">
+        <form action="{{ route('landing') }}" method="GET" class="flex gap-2">
+            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari judul / author..." class="flex-1 border rounded px-3 py-2">
+            <select name="sort" class="border rounded px-2 py-2">
+                <option value="">Sort: Latest</option>
+                <option value="rank" {{ request('sort')=='rank' ? 'selected' : '' }}>Rank</option>
+                <option value="rating" {{ request('sort')=='rating' ? 'selected' : '' }}>Rating</option>
+            </select>
+            <button class="bg-blue-600 text-white px-4 py-2 rounded">Cari</button>
+        </form>
     </div>
-</section>
-<!-- Popular Manga -->
-<section class="bg-white py-12 sm:py-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h3 class="text-2xl sm:text-3xl font-bold text-[#3E5F44] mb-6 sm:mb-8">🇯🇵 Manga Populer</h3>
-        <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#93DA97] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Demon Slayer</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 205</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#93DA97] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">My Hero Academia</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 410</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#93DA97] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Naruto</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 700</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#93DA97] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Attack on Titan</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 139</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#93DA97] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Bleach</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 686</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#93DA97] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Tokyo Ghoul</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 179</p>
-            </div>
+
+    {{-- Top Rank --}}
+    <section class="mb-10">
+        <h2 class="text-xl font-bold mb-4">Top Rank</h2>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            @foreach($topRank as $comic)
+                <div class="bg-white rounded shadow p-2 text-center">
+                    <img src="{{ asset('storage/covers/'.$comic->cover_image) }}" alt="{{ $comic->title }}" class="w-full h-40 object-cover rounded">
+                    <h3 class="text-sm font-semibold mt-2">{{ Str::limit($comic->title, 30) }}</h3>
+                    <p class="text-xs text-gray-500">Rank #{{ $comic->rank }}</p>
+                </div>
+            @endforeach
         </div>
-    </div>
-</section>
-<!-- Popular Manhwa -->
-<section class="py-12 sm:py-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h3 class="text-2xl sm:text-3xl font-bold text-[#3E5F44] mb-6 sm:mb-8">🇰🇷 Manhwa Populer</h3>
-        <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#5E936C] to-[#3E5F44] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">The Beginning After The End</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 180</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#5E936C] to-[#3E5F44] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Omniscient Reader</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 165</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#5E936C] to-[#3E5F44] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">True Beauty</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 220</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#5E936C] to-[#3E5F44] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Lookism</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 480</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#5E936C] to-[#3E5F44] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">The God of High School</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 540</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#5E936C] to-[#3E5F44] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Noblesse</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 544</p>
-            </div>
+    </section>
+
+    {{-- Top Rated --}}
+    <section class="mb-10">
+        <h2 class="text-xl font-bold mb-4">Top Rated</h2>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            @foreach($topRated as $comic)
+                <div class="bg-white rounded shadow p-2 text-center">
+                    <img src="{{ asset('storage/covers/'.$comic->cover_image) }}" alt="{{ $comic->title }}" class="w-full h-40 object-cover rounded">
+                    <h3 class="text-sm font-semibold mt-2">{{ Str::limit($comic->title, 30) }}</h3>
+                    <p class="text-xs text-gray-500">Rating: {{ $comic->rating }}</p>
+                </div>
+            @endforeach
         </div>
-    </div>
-</section>
-<!-- Popular Manhua -->
-<section class="bg-white py-12 sm:py-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h3 class="text-2xl sm:text-3xl font-bold text-[#3E5F44] mb-6 sm:mb-8">🇨🇳 Manhua Populer</h3>
-        <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#3E5F44] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Tales of Demons and Gods</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 450</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#3E5F44] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">The King's Avatar</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 390</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#3E5F44] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Martial Peak</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 3500</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#3E5F44] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Soul Land</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 360</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#3E5F44] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Apotheosis</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 900</p>
-            </div>
-            <div class="card-hover cursor-pointer">
-                <div class="bg-gradient-to-br from-[#3E5F44] to-[#5E936C] rounded-lg mb-2 sm:mb-3 shadow-md" style="aspect-ratio: 2/3;"></div>
-                <h4 class="font-semibold text-gray-800 text-xs sm:text-base leading-tight">Battle Through The Heavens</h4>
-                <p class="text-xs sm:text-sm text-gray-500">Ch 1650</p>
-            </div>
+    </section>
+
+    {{-- Latest --}}
+    <section class="mb-10">
+        <h2 class="text-xl font-bold mb-4">Latest</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            @foreach($latest as $comic)
+                <x-comic-card :comic="$comic" />
+            @endforeach
         </div>
-    </div>
-</section>
-<!-- Latest Updates Section -->
-<section class="py-12 sm:py-16 bg-gradient-to-b from-[#E8FFD7] to-[#93DA97]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h3 class="text-2xl sm:text-3xl font-bold text-[#3E5F44] mb-6 sm:mb-8 text-center">📚 Update Terbaru</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 card-hover">
-                <div class="flex items-start space-x-3 sm:space-x-4">
-                    <div class="w-16 h-24 sm:w-20 sm:h-28 bg-gradient-to-br from-[#5E936C] to-[#3E5F44] rounded flex-shrink-0"></div>
-                    <div class="flex-1">
-                        <h4 class="font-semibold text-gray-800 mb-1 sm:mb-2 text-sm sm:text-base">Return of the Mount Hua Sect</h4>
-                        <p class="text-xs sm:text-sm text-gray-600 mb-2">Chapter 125 - Fresh update!</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs text-gray-500">4 jam lalu</span>
-                            <span class="bg-[#3E5F44] text-white text-xs px-2 sm:px-3 py-1 rounded-full">NEW</span>
+    </section>
+
+    {{-- Main listing (paginated) --}}
+    <section class="mb-10">
+        <h2 class="text-xl font-bold mb-4">All Comics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            @foreach($comics as $comic)
+                <div class="bg-white rounded shadow p-4">
+                    <div class="flex gap-4">
+                        <img src="{{ asset('storage/covers/'.$comic->cover_image) }}" alt="{{ $comic->title }}" class="w-24 h-32 object-cover rounded">
+                        <div>
+                            <h3 class="font-semibold">{{ $comic->title }}</h3>
+                            <p class="text-sm text-gray-600">{{ $comic->author }}</p>
+                            <p class="text-xs text-gray-500 mt-2">Type: {{ $comic->type }} • Status: {{ $comic->status }}</p>
+                            <p class="text-xs text-gray-500">Ch: {{ $comic->chapters }} • Rating: {{ $comic->rating }}</p>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 card-hover">
-                <div class="flex items-start space-x-3 sm:space-x-4">
-                    <div class="w-16 h-24 sm:w-20 sm:h-28 bg-gradient-to-br from-[#3E5F44] to-[#5E936C] rounded flex-shrink-0"></div>
-                    <div class="flex-1">
-                        <h4 class="font-semibold text-gray-800 mb-1 sm:mb-2 text-sm sm:text-base">I Shall Seal the Heavens</h4>
-                        <p class="text-xs sm:text-sm text-gray-600 mb-2">Chapter 580 - Hot release!</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs text-gray-500">6 jam lalu</span>
-                            <span class="bg-[#3E5F44] text-white text-xs px-2 sm:px-3 py-1 rounded-full">NEW</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
-        <div class="text-center mt-6 sm:mt-8">
-            <button class="bg-[#3E5F44] text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold hover:bg-[#5E936C] transition text-sm sm:text-base">
-                Lihat Semua Update
-            </button>
+
+        <div class="mt-6">
+            {{ $comics->links() }}
         </div>
-    </div>
-</section>
+    </section>
 @endsection

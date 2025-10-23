@@ -3,10 +3,10 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ComicController;
 
-Route::get('/', function () {
-    return view('landing');
-})->name('landing');
+Route::get('/', [ComicController::class, 'index'])->name('landing');
+
 
 
 // Auth routes
