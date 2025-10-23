@@ -11,3 +11,204 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Gradient Background */
+.gradient-bg {
+    background: linear-gradient(135deg, #3E5F44 0%, #5E936C 100%);
+}
+
+/* Card Hover Effect */
+.card-hover {
+    transition: all 0.3s ease;
+}
+.card-hover:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+/* ================= HERO SLIDER FIX ================= */
+.hero-slider {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-slides-container {
+    position: relative;
+    height: 500px; /* FIX: tinggi konstan untuk semua slide */
+    overflow: hidden;
+}
+
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%; /* FIX: semua slide isi penuh area */
+    opacity: 0;
+    visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease-in-out, visibility 0s 0.8s;
+}
+
+.hero-slide.active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.8s ease-in-out, visibility 0s 0s;
+    z-index: 5;
+}
+
+/* Slider Dots */
+.slider-dots {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.slider-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.slider-dot.active {
+    background: white;
+    width: 32px;
+    border-radius: 6px;
+}
+
+/* Arrows */
+.slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+.slider-arrow:hover {
+    background: rgba(255,255,255,0.4);
+}
+.slider-arrow.left {
+    left: 20px;
+}
+.slider-arrow.right {
+    right: 20px;
+}
+
+/* Event Card Animation */
+.event-card {
+    animation: slideUp 0.6s ease-out;
+}
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Manga Card - Maintain aspect ratio */
+.manga-card {
+    aspect-ratio: 2/3;
+    width: 100%;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+
+    .hero-slides-container {
+        height: 350px; /* sedikit lebih kecil di mobile */
+    }
+
+    .hero-slide h2 {
+        font-size: 2rem !important;
+    }
+    .hero-slide p {
+        font-size: 0.95rem !important;
+    }
+
+    .slider-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    .slider-arrow.left {
+        left: 10px;
+    }
+    .slider-arrow.right {
+        right: 10px;
+    }
+
+    .manga-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+
+    .manga-card h4 {
+        font-size: 0.75rem;
+        line-height: 1.2;
+    }
+    .manga-card p {
+        font-size: 0.65rem;
+    }
+
+    .event-card h3 {
+        font-size: 1.25rem !important;
+    }
+    .event-card p {
+        font-size: 0.875rem !important;
+    }
+
+    .ranking-card {
+        padding: 1rem !important;
+    }
+    .ranking-card h4 {
+        font-size: 0.875rem;
+    }
+    .ranking-card .rank-number {
+        font-size: 2rem !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .hero-slides-container {
+        height: 320px;
+    }
+
+    .manga-grid {
+        gap: 0.5rem;
+    }
+
+    .hero-slide h2 {
+        font-size: 1.75rem !important;
+        margin-bottom: 1rem !important;
+    }
+    .hero-slide p {
+        font-size: 0.875rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
