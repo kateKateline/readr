@@ -1,4 +1,4 @@
-@forelse($manhwa as $item)
+@forelse($manhua as $item)
     <div class="bg-[#161b22] rounded-xl p-3 shadow hover:shadow-lg transition">
         <img src="{{ asset('storage/'.$item->cover_image) }}" 
              alt="{{ $item->title }}" 
@@ -7,5 +7,5 @@
         <p class="text-sm text-gray-400">{{ $item->author ?? 'Unknown' }}</p>
     </div>
 @empty
-    <p class="text-gray-400">Belum ada manhwa yang diunggah.</p>
+    <p class="text-gray-400">Belum ada manhua yang diunggah.</p>
 @endforelse

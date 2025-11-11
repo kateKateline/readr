@@ -23,19 +23,19 @@
         </nav>
 
         <!-- Button -->
-<div class="flex items-center gap-3">
-    @auth
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit" class="text-sm text-white border border-[#30363d] px-3 py-2 rounded-lg hover:bg-blue-600 hover:border-blue-600 transition">
-                Logout
-            </button>
-        </form>
-    @else
-        <a href="{{ route('login') }}" class="text-sm text-white border border-[#30363d] px-3 py-2 rounded-lg hover:bg-blue-600 hover:border-blue-600 transition">
-            Login
-        </a>
-    @endauth
-</div>
+        <div class="flex items-center gap-3">
+            @auth
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="text-sm text-white border border-[#30363d] px-3 py-2 rounded-lg hover:bg-blue-600 hover:border-blue-600 transition">
+                        Logout
+                    </button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="text-sm text-white border border-[#30363d] px-3 py-2 rounded-lg hover:bg-blue-600 hover:border-blue-600 transition">
+                    Login
+                </a>
+            @endauth
+        </div>
     </div>
 </header>
