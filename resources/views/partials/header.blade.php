@@ -7,10 +7,10 @@
 
         <!-- Navigation -->
         <nav class="space-x-6 hidden md:block text-base">
-            <a href="/" class="text-gray-400 hover:text-gray-200 transition">Home</a>
-            <a href="#" class="text-gray-400 hover:text-gray-200 transition">Explore</a>
-            <a href="#" class="text-gray-400 hover:text-gray-200 transition">About</a>
-            <a href="#" class="text-gray-400 hover:text-gray-200 transition">Contact</a>
+            <a href="/" class="text-white">Home</a>
+            <a href="#" class="text-white">Explore</a>
+            <a href="#" class="text-white">About</a>
+            <a href="#" class="text-white">Contact</a>
         </nav>
 
         <!-- Right Section -->

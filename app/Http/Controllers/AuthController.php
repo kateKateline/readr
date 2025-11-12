@@ -15,6 +15,48 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    // Tampilkan form registrasi
+    public function showRegister()
+    {
+        return view('auth.regis');
+    }
+
+    // Proses registrasi
+    public function register(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'terms' => ['required', 'accepted'],
+        ], [
+            'name.required' => 'Nama lengkap wajib diisi',
+            'email.required' => 'Email wajib diisi',
+            'email.email' => 'Email tidak valid',
+            'email.unique' => 'Email sudah terdaftar',
+            'password.required' => 'Password wajib diisi',
+            'password.min' => 'Password minimal 8 karakter',
+            'password.confirmed' => 'Konfirmasi password tidak cocok',
+            'terms.required' => 'Anda harus menyetujui Syarat & Ketentuan',
+            'terms.accepted' => 'Anda harus menyetujui Syarat & Ketentuan',
+        ]);
+
+        // Buat user baru
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'level' => 'user', // Set default level sebagai user biasa
+        ]);
+
+        // Auto-login user setelah registrasi
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        // Redirect ke home
+        return redirect()->intended('/');
+    }
+
     // Proses login
     public function login(Request $request)
     {

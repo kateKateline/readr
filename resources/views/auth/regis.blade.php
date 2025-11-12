@@ -6,13 +6,24 @@
 
         <!-- Header -->
         <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-            <p class="text-[#8b949e]">Login to continue reading your favorite series 🌿</p>
+            <h2 class="text-3xl font-bold text-white mb-2">Create Account</h2>
+            <p class="text-[#8b949e]">Join our community and start reading 📖</p>
         </div>
 
-        <form action="{{ route('login.post') }}" method="POST" class="space-y-6">
+        <form action="{{ route('register.post') }}" method="POST" class="space-y-6">
             @csrf
         
+            <!-- Name -->
+            <div>
+                <label for="name" class="block text-sm font-medium text-[#c9d1d9] mb-1">Username</label>
+                <input type="text" id="name" name="name" value="{{ old('name') }}"
+                    class="w-full bg-[#0d1117] border border-[#30363d] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    placeholder="John Doe" required>
+                @error('name')
+                    <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
             <!-- Email -->
             <div>
                 <label for="email" class="block text-sm font-medium text-[#c9d1d9] mb-1">Email</label>
@@ -35,19 +46,30 @@
                 @enderror
             </div>
 
-            <!-- Remember Me -->
-            <div class="flex items-center justify-between text-sm">
-                <label class="flex items-center gap-2 text-[#8b949e]">
-                    <input type="checkbox" class="rounded border-[#30363d] bg-[#0d1117]">
-                    Remember me
+            <!-- Confirm Password -->
+            <div>
+                <label for="password_confirmation" class="block text-sm font-medium text-[#c9d1d9] mb-1">Confirm Password</label>
+                <input type="password" id="password_confirmation" name="password_confirmation"
+                    class="w-full bg-[#0d1117] border border-[#30363d] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    placeholder="••••••••" required>
+                @error('password_confirmation')
+                    <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Terms & Conditions -->
+            <div class="flex items-center gap-2 text-sm">
+                <input type="checkbox" id="terms" name="terms" class="rounded border-[#30363d] bg-[#0d1117]" required>
+                <label for="terms" class="text-[#8b949e]">
+                    I agree to the 
+                    <a href="#" class="text-blue-500 hover:underline">Terms & Conditions</a>
                 </label>
-                <a href="#" class="text-blue-500 hover:underline">Forgot password?</a>
             </div>
 
             <!-- Button -->
             <button type="submit"
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg py-2 transition">
-                Login
+                Sign Up
             </button>
         </form>
 
@@ -71,10 +93,10 @@
             </button>
         </div>
 
-        <!-- Register -->
+        <!-- Login Link -->
         <p class="text-center text-sm text-[#8b949e] mt-6">
-            Don't have an account?
-            <a href="{{ route('register') }}" class="text-blue-500 hover:underline">Sign up</a>
+            Already have an account?
+            <a href="{{ route('login') }}" class="text-blue-500 hover:underline">Sign in</a>
         </p>
     </div>
 </section>
