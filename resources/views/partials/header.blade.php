@@ -63,7 +63,7 @@
                         
                         <!-- Menu items -->
                         <div class="py-1">
-                            <a href="#" 
+                            <a href="{{ route('profile', Auth::user()->id) }}" 
                                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-[#1c2128] transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
                                      stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-500">

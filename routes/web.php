@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ComicController;
+use App\Http\Controllers\ProfileController;
 
 //landing page
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -23,3 +24,6 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 //Show comic
 Route::get('/comics/show/{slug}', [ComicController::class, 'show'])->name('comic.show');
+
+// Profile (protected)
+Route::get('/profile', [ProfileController::class, 'index'])->middleware('auth')->name('profile');
