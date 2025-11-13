@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ComicController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardComicController;
 
 //landing page
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -21,6 +22,13 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'isAdmin'])
     ->name('dashboard');
+
+// Dashboard - comics CRUD (admin)
+Route::middleware(['auth', 'isAdmin'])->group(function () {
+    Route::resource('/dashboard/comics', DashboardComicController::class)
+        ->names('dashboard.comics')
+        ->except(['show']);
+});
 
 //Show comic
 Route::get('/comics/show/{slug}', [ComicController::class, 'show'])->name('comic.show');
