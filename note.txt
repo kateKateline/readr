@@ -3,3 +3,9 @@ npm  install
 
 cp .env.example .env
 php artisan key:generate
+
+
+#documentation#
+
+11/13/2025-s
+membuat crud comics
