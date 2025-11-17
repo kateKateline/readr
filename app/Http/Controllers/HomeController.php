@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -10,30 +11,30 @@ class HomeController extends Controller
     {
         $url = "https://api.mangadex.org/manga?limit=20&includes[]=cover_art&order[followedCount]=desc";
 
-        $response = Http::get($url);
+        // 🔥 Cache data 6 jam supaya tidak hit API terus
+        $raw = Cache::remember('mangadex_home', now()->addHours(6), function () use ($url) {
+            $response = Http::get($url);
 
-        if ($response->failed()) {
-            abort(500, "Gagal mengambil data dari MangaDex API");
-        }
+            if ($response->failed()) {
+                return []; // jangan crash
+            }
 
-        $raw = $response->json()['data'] ?? [];
+            return $response->json()['data'] ?? [];
+        });
 
         $manga = collect($raw)->map(function ($item) {
 
-            // ambil attributes
             $attr = $item['attributes'];
 
-            // ambil judul
             $title =
                 $attr['title']['en']
                 ?? $attr['title']['ja']
                 ?? $attr['title']['jp']
                 ?? 'No Title';
 
-            // ambil type (Format)
             $type = $attr['originalLanguage'] ?? 'Unknown';
 
-            // ambil cover
+            // cover relationship
             $coverRel = collect($item['relationships'])
                 ->firstWhere('type', 'cover_art');
 
@@ -51,7 +52,7 @@ class HomeController extends Controller
                 'title'    => $title,
                 'type'     => $type,
                 'image'    => $image,
-                'endpoint' => $item['id'], // untuk route comic.show
+                'endpoint' => $item['id'],
             ];
         });
 

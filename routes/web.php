@@ -1,39 +1,50 @@
-    <?php
+<?php
 
-    use Illuminate\Support\Facades\Route;
-    use App\Http\Controllers\AuthController;
-    use App\Http\Controllers\DashboardController;
-    use App\Http\Controllers\HomeController;
-    use App\Http\Controllers\ProfileController;
-    use App\Http\Controllers\DashboardComicController;
-    use App\Http\Controllers\ImageProxyController;
-    use App\Http\Controllers\ComicController;
-    
- 
-    
-    
-    Route::get('/', [HomeController::class, 'index'])->name('home');
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardComicController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ComicController;
 
+// =============================================
+// PUBLIC ROUTES
+// =============================================
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/comics/{id}', [ComicController::class, 'show'])->name('comic.show');
 
-    //Auth
+// =============================================
+// AUTH ROUTES
+// =============================================
+Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
 
-    //Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->middleware(['auth', 'isAdmin'])
-        ->name('dashboard');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
-    // Dashboard - comics CRUD (admin)
-    Route::middleware(['auth', 'isAdmin'])->group(function () {
+// =============================================
+// PROTECTED ROUTES
+// =============================================
+Route::middleware('auth')->group(function () {
+    
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+
+    // DASHBOARD ADMIN (ROLE: ADMIN)
+    Route::middleware('isAdmin')->group(function () {
+
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Dashboard CRUD Comics/Manga
         Route::resource('/dashboard/comics', DashboardComicController::class)
             ->names('dashboard.comics')
             ->except(['show']);
-    });
-    Route::get('/comics/{id}', [ComicController::class, 'show'])->name('comic.show');
 
-    // Profile (protected)
-    Route::get('/profile', [ProfileController::class, 'index'])->middleware('auth')->name('profile');
+    });
+
+});
