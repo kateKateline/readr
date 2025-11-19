@@ -13,5 +13,6 @@ class Comic extends Model
         'image',
         'status',
         'last_update',
+        'last_chapter',
     ];
 }
