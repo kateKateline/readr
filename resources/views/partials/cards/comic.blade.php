@@ -15,7 +15,7 @@
                         'en' => '🇬🇧',
                     ];
                     $lang = strtolower($item['type'] ?? 'unknown');
-                    $flag = $flags[$lang] ?? '🌐';
+                    $flag = $flags[$lang] ?? '?';
                 @endphp
 
                 <span class="inline-block px-2 py-1 bg-black/60 backdrop-blur-sm rounded-md text-xl">
@@ -57,17 +57,16 @@
             </h3>
 
             <!-- Last Update -->
-            @if(!empty($item['last_update']))
+            @if(!empty($item['last_update']) && !empty($item['last_chapter']))
                 <div class="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-[#21262d]">
                     <span class="font-medium">
-                        Chapter — {{-- nanti diganti real chapter --}}
+                        Chapter {{ $item['last_chapter'] }}
                     </span>
                     <span>
                         {{ \Carbon\Carbon::parse($item['last_update'])->diffForHumans(['short' => true]) }}
                     </span>
                 </div>
-            @endif
-
+            @endif  
         </div>
     </a>
 @endforeach

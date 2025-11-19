@@ -11,7 +11,7 @@
 <body class="bg-[#0d1117] text-[#c9d1d9] min-h-screen flex flex-col font-sans">
 
     <!-- Header -->
-    @include('partials.header')
+    @include('partials.layout.header')
 
     <!-- Main Content -->
     <main class="flex-1">
@@ -19,7 +19,7 @@
     </main>
 
     <!-- Footer -->
-    @include('partials.footer')
+    @include('partials.layout.footer')
 
     @stack('scripts')
 </body>
