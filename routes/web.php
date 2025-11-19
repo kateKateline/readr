@@ -12,7 +12,9 @@ use App\Http\Controllers\ComicController;
 // PUBLIC ROUTES
 // =============================================
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/comics/{id}', [ComicController::class, 'show'])->name('comic.show');
+Route::get('/comics/{mangadex_id}', [ComicController::class, 'show'])
+     ->name('comic.show');
+
 
 // =============================================
 // AUTH ROUTES
