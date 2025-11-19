@@ -63,9 +63,9 @@
                         Chapter {{ $item['last_chapter'] }}
                     </span>
                     <span>
-                        {{ \Carbon\Carbon::parse($item['last_update'])->diffForHumans(['short' => true]) }}
+                        {{ formatShortDate($item['last_update']) }}
                     </span>
-                </div>
+                </div>  
             @endif  
         </div>
     </a>

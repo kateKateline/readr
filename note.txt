@@ -2,16 +2,19 @@ composer install
 npm  install
 
 cp .env.example .env
-php artisan key:generate
+php artisan key:generate    
 
 php artisan sync:comics
 
 
 
-======documentation========
+=======documentation========
 
 11/13/2025 -s
 make crud comics
 
 11/17/2025 -h
 api intergrated, not yet finished
+
+11/19/2025 -h
+fix bug and adding some ui elements
