@@ -7,6 +7,10 @@ use App\Http\Controllers\DashboardComicController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ComicController;
+use App\Http\Controllers\GlobalChatController;
+
+Route::post('/global-chat', [GlobalChatController::class, 'store'])
+     ->name('global-chat.store');
 
 // =============================================
 // PUBLIC ROUTES
