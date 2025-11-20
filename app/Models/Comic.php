@@ -12,6 +12,7 @@ class Comic extends Model
         'type',
         'image',
         'status',
+        'is_sensitive',
         'last_update',
         'last_chapter',
     ];

@@ -17,7 +17,9 @@ class User extends Authenticatable
         'profile_image',
         'profile_banner',
         'level',
+        'censorship_enabled',
     ];
+
 
     protected $hidden = [
         'password',

@@ -63,6 +63,8 @@ class ComicService
                     'type'         => $attr['originalLanguage'] ?? 'unknown', 
                     'image'        => $image, 
                     'status'       => $attr['status'] ?? null, 
+
+                    'is_sensitive' => $this->isSensitive($item), 
                  
                     'last_update'  => isset($chapterInfo['updated']) 
                                         ? Carbon::parse($chapterInfo['updated']) 
@@ -125,4 +127,30 @@ class ComicService
                 ?? null, 
         ];
     }
+    private function isSensitive($item)
+{
+    $sensitiveTags = [
+        'ecchi',
+        'adult',
+        'mature',
+        'sexual violence',
+        'gore',
+        'smut',
+        'hentai'
+    ];
+
+    $tags = collect($item['attributes']['tags'] ?? [])
+        ->pluck('attributes.name.en')
+        ->map(fn($t) => strtolower($t)) // normalize
+        ->toArray();
+
+    foreach ($sensitiveTags as $tag) {
+        if (in_array(strtolower($tag), $tags)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 }

@@ -18,3 +18,7 @@ api intergrated, not yet finished
 
 11/19/2025 -h
 fix bug and adding some ui elements
+
+9:22AM 11/20/2025 -s
+censorship feature 
+
