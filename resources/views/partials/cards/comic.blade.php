@@ -49,18 +49,27 @@
         </div>
         
         <!-- Info -->
-        <div class="p-3">
+        <div class="p-3 space-y-2">
 
-            <!-- Title -->
-            <h3 class="font-medium text-sm text-gray-200 line-clamp-2 mb-2 min-h-[2.5rem] group-hover:text-white transition">
-                {{ $item['title'] }}
+            <!-- Title dengan Truncate -->
+            <h3 class="font-medium text-sm text-gray-200 group-hover:text-white transition truncate" 
+                title="{{ $item['title'] }}">
+                {{ Str::limit($item['title'], 40, '...') }}
             </h3>
+
+            <!-- Author -->
+            <p class="text-xs text-gray-400 truncate flex items-center gap-1" title="{{ $item['author'] ?? 'Unknown Author' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+                <span>{{ $item['author'] ?? 'Unknown Author' }}</span>
+            </p>
 
             <!-- Last Update -->
             @if(!empty($item['last_update']) && !empty($item['last_chapter']))
                 <div class="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-[#21262d]">
                     <span class="font-medium">
-                        Chapter {{ $item['last_chapter'] }}
+                        Ch. {{ $item['last_chapter'] }}
                     </span>
                     <span>
                         {{ formatShortDate($item['last_update']) }}

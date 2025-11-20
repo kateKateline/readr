@@ -9,6 +9,7 @@ class Comic extends Model
     protected $fillable = [
         'mangadex_id',
         'title',
+        'author',
         'type',
         'image',
         'status',
