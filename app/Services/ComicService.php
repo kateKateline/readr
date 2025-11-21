@@ -10,10 +10,9 @@ use Illuminate\Support\Facades\Log;
 class ComicService 
 { 
     private $base = "https://api.mangadex.org"; 
- 
+    //Base URL Mangadex API
     public function fetchPopular($limit = 20) 
     { 
-        // Tambahkan author ke includes
         $url = "{$this->base}/manga?limit={$limit}&includes[]=cover_art&includes[]=author&order[followedCount]=desc"; 
  
         $res = Http::get($url); 
@@ -23,6 +22,34 @@ class ComicService
         } 
  
         return $res->json('data'); 
+    }
+
+    /**
+     * Build a comma-separated author string from an API item and an authors map.
+     * This consolidates duplicated logic used during sync operations.
+     *
+     * @param array $item
+     * @param array $authorsMap
+     * @return string
+     */
+    private function getAuthorNames(array $item, array $authorsMap): string
+    {
+        $authorNames = collect($item['relationships'] ?? [])
+            ->filter(fn($rel) => ($rel['type'] ?? '') === 'author')
+            ->map(function ($rel) use ($authorsMap) {
+                if (isset($rel['id']) && isset($authorsMap[$rel['id']])) {
+                    return $authorsMap[$rel['id']];
+                }
+                if (isset($rel['attributes']['name'])) {
+                    return $rel['attributes']['name'];
+                }
+                return null;
+            })
+            ->filter()
+            ->values();
+
+        $authorName = $authorNames->isEmpty() ? 'Unknown Author' : $authorNames->join(', ');
+        return mb_substr($authorName, 0, 200);
     }
 
     /**
@@ -114,26 +141,8 @@ class ComicService
                 ? "https://uploads.mangadex.org/covers/{$mangaId}/{$cover['attributes']['fileName']}.256.jpg" 
                 : null;
 
-            // Ambil author
-            $authorNames = collect($item['relationships'] ?? [])
-                ->filter(fn($rel) => $rel['type'] === 'author')
-                ->map(function($rel) use ($authorsMap) {
-                    if (isset($rel['id']) && isset($authorsMap[$rel['id']])) {
-                        return $authorsMap[$rel['id']];
-                    }
-                    if (isset($rel['attributes']['name'])) {
-                        return $rel['attributes']['name'];
-                    }
-                    return null;
-                })
-                ->filter()
-                ->values();
-            
-            $authorName = $authorNames->isEmpty() 
-                ? 'Unknown Author' 
-                : $authorNames->join(', ');
-            
-            $authorName = mb_substr($authorName, 0, 200);
+            // Get author string (comma-separated) using shared helper
+            $authorName = $this->getAuthorNames($item, $authorsMap);
 
             // Ambil chapter info
             $chapterInfo = $this->fetchLastChapter($mangaId) ?? [];
@@ -236,6 +245,8 @@ class ComicService
         return null;
     }
  
+
+    // Base sync manga
     public function sync($limit = 20) 
     { 
         $data = $this->fetchPopular($limit); 
@@ -263,7 +274,7 @@ class ComicService
                 ? "https://uploads.mangadex.org/covers/{$item['id']}/{$cover['attributes']['fileName']}.256.jpg" 
                 : null; 
  
-            // ✅ FIX: Ambil SEMUA author dan gabungkan dengan koma
+            // Ambil author
             $authorNames = collect($item['relationships'] ?? [])
                 ->filter(fn($rel) => $rel['type'] === 'author')
                 ->map(function($rel) use ($authorsMap) {
@@ -280,12 +291,12 @@ class ComicService
                 ->filter()
                 ->values();
             
-            // Gabungkan semua author dengan koma, max 200 karakter
+            // Gabungkan semua author dengan koma
             $authorName = $authorNames->isEmpty() 
                 ? 'Unknown Author' 
                 : $authorNames->join(', ');
             
-            // Potong jika terlalu panjang (database limit)
+            // Max 200 karakter
             $authorName = mb_substr($authorName, 0, 200);
  
             // Ambil chapter dengan berbagai fallback
@@ -315,10 +326,10 @@ class ComicService
                     ] 
                 );
                 
-                Log::info("✅ Synced: {$title} | Author: {$authorName}");
+                Log::info("Synced: {$title} | Author: {$authorName}");
                 
             } catch (\Exception $e) {
-                Log::error("❌ Failed to sync {$title}: " . $e->getMessage());
+                Log::error("Failed to sync {$title}: " . $e->getMessage());
             }
  
         } 
@@ -383,53 +394,109 @@ class ComicService
  
     private function fetchLastChapter($mangaId) 
     { 
-        // Coba ambil chapter bahasa Inggris dulu
-        $url = "{$this->base}/chapter?manga={$mangaId}&limit=1&translatedLanguage[]=en&order[readableAt]=desc&includeFutureUpdates=0";
- 
-        $res = Http::get($url); 
- 
-        // Jika ada chapter bahasa Inggris, return
-        if ($res->successful() && !empty($res->json('data'))) { 
-            $chapter = $res->json('data')[0]; 
-            return $this->extractChapterInfo($chapter);
-        } 
- 
-        // Kalau tidak ada EN, coba ambil chapter BAHASA APAPUN
-        $url = "{$this->base}/chapter?manga={$mangaId}&limit=1&order[readableAt]=desc&includeFutureUpdates=0";
- 
-        $res = Http::get($url); 
- 
-        if ($res->successful() && !empty($res->json('data'))) { 
-            $chapter = $res->json('data')[0]; 
-            return $this->extractChapterInfo($chapter);
+        // Fetch multiple chapters (up to 100) and pick the one with the highest numeric chapter value.
+        // This avoids cases where ordering by date returns a low-numbered chapter while the
+        // highest chapter number exists elsewhere (e.g. decimals or different languages).
+        $limits = [
+            // prefer English translations first
+            "{$this->base}/chapter?manga={$mangaId}&limit=100&translatedLanguage[]=en&order[readableAt]=desc&includeFutureUpdates=0",
+            // then any language
+            "{$this->base}/chapter?manga={$mangaId}&limit=100&order[readableAt]=desc&includeFutureUpdates=0",
+            // fallback to createdAt ordering
+            "{$this->base}/chapter?manga={$mangaId}&limit=100&order[createdAt]=desc",
+        ];
+
+        $allCandidates = [];
+
+        foreach ($limits as $url) {
+            try {
+                $res = Http::get($url);
+            } catch (\Exception $e) {
+                continue;
+            }
+
+            if (!$res->successful()) {
+                continue;
+            }
+
+            $data = $res->json('data', []);
+            foreach ($data as $chapter) {
+                $info = $this->extractChapterInfo($chapter);
+                if ($info) {
+                    $allCandidates[] = $info;
+                }
+            }
+
+            // If we already have candidates with numeric chapter numbers, stop after first successful fetch
+            if (!empty($allCandidates)) {
+                break;
+            }
         }
- 
-        // Fallback ke createdAt jika readableAt tidak ada
-        $url = "{$this->base}/chapter?manga={$mangaId}&limit=1&order[createdAt]=desc";
- 
-        $res = Http::get($url); 
- 
-        if ($res->successful() && !empty($res->json('data'))) { 
-            $chapter = $res->json('data')[0]; 
-            return $this->extractChapterInfo($chapter);
+
+        if (empty($allCandidates)) {
+            return null;
         }
- 
-        // Tidak ada chapter sama sekali
-        return null; 
+
+        // Prefer the entry with the largest numeric chapter value. If none have numeric, pick the most recent updated.
+        $numericCandidates = array_filter($allCandidates, fn($c) => isset($c['chapter_num']) && $c['chapter_num'] !== null);
+
+        if (!empty($numericCandidates)) {
+            usort($numericCandidates, fn($a, $b) => $b['chapter_num'] <=> $a['chapter_num']);
+            return $numericCandidates[0];
+        }
+
+        usort($allCandidates, function ($a, $b) {
+            $ta = $a['updated'] ? strtotime($a['updated']) : 0;
+            $tb = $b['updated'] ? strtotime($b['updated']) : 0;
+            return $tb <=> $ta;
+        });
+
+        return $allCandidates[0];
     } 
  
     private function extractChapterInfo($chapter)
     {
-        return [ 
-            'chapter' => $chapter['attributes']['chapter'] ?? 'N/A', 
-            'updated' => $chapter['attributes']['readableAt'] 
+        $raw = $chapter['attributes']['chapter'] ?? null;
+
+        return [
+            'chapter' => $raw ?? 'N/A',
+            // parsed numeric chapter when possible (e.g. '123', '12.5')
+            'chapter_num' => $this->parseChapterValue($raw),
+            'updated' => $chapter['attributes']['readableAt']
                 ?? $chapter['attributes']['publishAt']
                 ?? $chapter['attributes']['createdAt']
-                ?? $chapter['attributes']['updatedAt'] 
-                ?? null, 
+                ?? $chapter['attributes']['updatedAt']
+                ?? null,
         ];
     }
+
+    /**
+     * Parse a chapter string and return a numeric value when possible.
+     * Examples: '123' -> 123.0, '12.5' -> 12.5, 'ch. 45' -> 45.0
+     * Returns null when no numeric part is found.
+     *
+     * @param mixed $raw
+     * @return float|null
+     */
+    private function parseChapterValue($raw)
+    {
+        if ($raw === null) {
+            return null;
+        }
+
+        // Normalize to string and trim
+        $s = trim((string) $raw);
+
+        // Find first numeric occurrence, allowing decimals
+        if (preg_match('/(\d+(?:\.\d+)?)/', $s, $m)) {
+            return (float) $m[1];
+        }
+
+        return null;
+    }
     
+
+    // Cek apakah manga termasuk sensitif berdasarkan tags
     private function isSensitive($item)
     {
         $sensitiveTags = [

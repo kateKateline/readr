@@ -11,11 +11,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        /**
-         * 🧩 Middleware Kustom
-         * Di sini kita daftarkan alias agar bisa digunakan di route.
-         * Misalnya: ->middleware(['auth', 'isAdmin'])
-         */
         $middleware->alias([
             'isAdmin' => \App\Http\Middleware\IsAdmin::class,
         ]);
