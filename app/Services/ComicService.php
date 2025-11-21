@@ -231,7 +231,7 @@ class ComicService
             'hentai'
         ];
 
-        $tags = collect($item['attributes']['tags'] ?? [])
+        $tags = collect($temi['attributes']['tags'] ?? [])
             ->pluck('attributes.name.en')
             ->map(fn($t) => strtolower($t))
             ->toArray();

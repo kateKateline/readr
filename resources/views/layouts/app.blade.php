@@ -21,6 +21,50 @@
     <!-- Footer -->
     @include('partials.layout.footer')
 
-    @stack('scripts')
+<!-- Tambahkan script ini di bagian bawah layouts/app.blade.php sebelum </body> -->
+
+@stack('scripts')
+
+<script>
+    // Auto scroll chat ke bawah saat page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatContainer = document.querySelector('.chat-scrollbar');
+        
+        if (chatContainer) {
+            // Scroll ke bawah
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    });
+
+    // Optional: Auto refresh chat setiap 10 detik (jika ingin real-time)
+    // Uncomment kode di bawah jika ingin fitur auto-refresh
+    
+    /*
+    setInterval(function() {
+        // Reload hanya bagian chat tanpa refresh seluruh halaman
+        fetch(window.location.href)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newChatContainer = doc.querySelector('.chat-scrollbar');
+                const currentChatContainer = document.querySelector('.chat-scrollbar');
+                
+                if (newChatContainer && currentChatContainer) {
+                    const isAtBottom = currentChatContainer.scrollHeight - currentChatContainer.clientHeight <= currentChatContainer.scrollTop + 1;
+                    
+                    currentChatContainer.innerHTML = newChatContainer.innerHTML;
+                    
+                    // Scroll ke bawah jika user sudah di bawah sebelumnya
+                    if (isAtBottom) {
+                        currentChatContainer.scrollTop = currentChatContainer.scrollHeight;
+                    }
+                }
+            })
+            .catch(error => console.error('Error refreshing chat:', error));
+    }, 10000); // Refresh setiap 10 detik
+    */
+</script>
+
 </body>
 </html>

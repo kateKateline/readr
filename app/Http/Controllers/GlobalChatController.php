@@ -14,11 +14,12 @@ class GlobalChatController extends Controller
             'message' => 'required|string|max:500'
         ]);
 
+        // Buat chat baru
         GlobalChat::create([
-            'user_id' => Auth::id(), // null kalau guest
+            'user_id' => Auth::id(), // null jika guest
             'message' => $request->message,
         ]);
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Message sent!');
     }
 }
