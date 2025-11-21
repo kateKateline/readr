@@ -18,9 +18,13 @@
             @endif
         </div>
 
-        <!-- RIGHT: Chat Box -->
-        <div class="w-[320px] hidden lg:block">
+        <!-- RIGHT: Chat Box & Top Ranks -->
+        <div class="w-[320px] hidden lg:block space-y-4">
+            {{-- Global Chat --}}
             @include('partials.chat.global')
+            
+            {{-- Top Ranks --}}
+            @include('partials.cards.top-ranks')
         </div>
 
     </div>

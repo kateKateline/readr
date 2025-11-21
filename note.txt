@@ -4,7 +4,10 @@ npm  install
 cp .env.example .env
 php artisan key:generate    
 
+
+=======sync services========
 php artisan sync:comics
+php artisan sync:toprated
 php artisan globalchat:reset
 
 =======documentation========

@@ -23,7 +23,218 @@ class ComicService
         } 
  
         return $res->json('data'); 
-    } 
+    }
+
+    /**
+     * Fetch top ranked manga berdasarkan rating
+     * 
+     * @param int $limit
+     * @return \Illuminate\Support\Collection
+     */
+    public function getTopRankedComics($limit = 10, $censorshipEnabled = false)
+    {
+        // Ambil manga dengan rating tertinggi yang sudah ada di database
+        $query = Comic::query()
+            ->whereNotNull('rating')
+            ->where('rating', '>', 0);
+
+        // Filter berdasarkan censorship
+        if ($censorshipEnabled) {
+            $query->where('is_sensitive', false);
+        }
+
+        $topComics = $query
+            ->orderByDesc('rating')
+            ->orderByDesc('rating_count')
+            ->take($limit)
+            ->get();
+
+        // Jika kurang dari limit, fetch dari API
+        if ($topComics->count() < $limit) {
+            $this->syncTopRated($limit);
+            
+            // Query lagi setelah sync
+            $topComics = Comic::query()
+                ->whereNotNull('rating')
+                ->where('rating', '>', 0)
+                ->when($censorshipEnabled, function($q) {
+                    $q->where('is_sensitive', false);
+                })
+                ->orderByDesc('rating')
+                ->orderByDesc('rating_count')
+                ->take($limit)
+                ->get();
+        }
+
+        return $topComics;
+    }
+
+    /**
+     * Sync top rated manga dari MangaDex
+     * 
+     * @param int $limit
+     * @return void
+     */
+    public function syncTopRated($limit = 20)
+    {
+        // Fetch manga dengan rating tertinggi dari MangaDex
+        $url = "{$this->base}/manga?limit={$limit}&includes[]=cover_art&includes[]=author&order[rating]=desc&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica";
+
+        $res = Http::get($url);
+
+        if ($res->failed() || empty($res->json('data'))) {
+            Log::warning("Failed to fetch top rated manga from MangaDex");
+            return;
+        }
+
+        $data = $res->json('data');
+        $authorsMap = $this->getAuthorsMap($data);
+
+        // Fetch statistics untuk semua manga sekaligus
+        $mangaIds = collect($data)->pluck('id')->toArray();
+        $statistics = $this->fetchBatchStatistics($mangaIds);
+
+        foreach ($data as $item) {
+            $attr = $item['attributes'];
+            $mangaId = $item['id'];
+
+            // Ambil title
+            $titles = $attr['title'] ?? [];
+            $title = $titles['en'] 
+                ?? $titles['ja-ro']
+                ?? $titles['ja'] 
+                ?? $titles['jp']
+                ?? (!empty($titles) ? reset($titles) : "No Title");
+
+            // Ambil cover
+            $cover = collect($item['relationships'])
+                ->firstWhere('type', 'cover_art');
+
+            $image = $cover 
+                ? "https://uploads.mangadex.org/covers/{$mangaId}/{$cover['attributes']['fileName']}.256.jpg" 
+                : null;
+
+            // Ambil author
+            $authorNames = collect($item['relationships'] ?? [])
+                ->filter(fn($rel) => $rel['type'] === 'author')
+                ->map(function($rel) use ($authorsMap) {
+                    if (isset($rel['id']) && isset($authorsMap[$rel['id']])) {
+                        return $authorsMap[$rel['id']];
+                    }
+                    if (isset($rel['attributes']['name'])) {
+                        return $rel['attributes']['name'];
+                    }
+                    return null;
+                })
+                ->filter()
+                ->values();
+            
+            $authorName = $authorNames->isEmpty() 
+                ? 'Unknown Author' 
+                : $authorNames->join(', ');
+            
+            $authorName = mb_substr($authorName, 0, 200);
+
+            // Ambil chapter info
+            $chapterInfo = $this->fetchLastChapter($mangaId) ?? [];
+
+            // Ambil rating dari statistics
+            $stat = $statistics[$mangaId] ?? null;
+            $rating = null;
+            $ratingCount = null;
+
+            if ($stat) {
+                // Gunakan Bayesian rating (lebih akurat)
+                $rating = $stat['rating']['bayesian'] ?? $stat['rating']['average'] ?? null;
+                $ratingCount = isset($stat['rating']['distribution']) 
+                    ? array_sum($stat['rating']['distribution']) 
+                    : 0;
+            }
+
+            try {
+                Comic::updateOrCreate(
+                    ['mangadex_id' => $mangaId],
+                    [
+                        'title'        => $title,
+                        'type'         => $attr['originalLanguage'] ?? 'unknown',
+                        'image'        => $image,
+                        'status'       => $attr['status'] ?? null,
+                        'author'       => $authorName,
+                        'is_sensitive' => $this->isSensitive($item),
+                        'last_update'  => isset($chapterInfo['updated']) 
+                                            ? Carbon::parse($chapterInfo['updated']) 
+                                            : null,
+                        'last_chapter' => $chapterInfo['chapter'] ?? null,
+                        'rating'       => $rating,
+                        'rating_count' => $ratingCount,
+                    ]
+                );
+
+                Log::info("✅ Synced (Top Rated): {$title} | Rating: " . ($rating ? number_format($rating, 2) : 'N/A'));
+
+            } catch (\Exception $e) {
+                Log::error("❌ Failed to sync top rated {$title}: " . $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Fetch statistics untuk multiple manga sekaligus
+     * 
+     * @param array $mangaIds
+     * @return array [manga_id => statistics]
+     */
+    private function fetchBatchStatistics($mangaIds)
+    {
+        $statistics = [];
+
+        // MangaDex API mendukung batch statistics
+        $chunks = array_chunk($mangaIds, 100);
+
+        foreach ($chunks as $chunk) {
+            $ids = implode('&manga[]=', $chunk);
+            $url = "{$this->base}/statistics/manga?manga[]={$ids}";
+
+            try {
+                $res = Http::timeout(15)->get($url);
+
+                if ($res->successful()) {
+                    $data = $res->json('statistics', []);
+                    $statistics = array_merge($statistics, $data);
+                }
+            } catch (\Exception $e) {
+                Log::warning("Failed to fetch batch statistics: {$e->getMessage()}");
+            }
+
+            // Rate limiting
+            usleep(200000); // 200ms delay
+        }
+
+        return $statistics;
+    }
+
+    /**
+     * Fetch single manga statistics
+     * 
+     * @param string $mangaId
+     * @return array|null
+     */
+    public function fetchMangaStatistics($mangaId)
+    {
+        $url = "{$this->base}/statistics/manga/{$mangaId}";
+
+        try {
+            $res = Http::timeout(10)->get($url);
+
+            if ($res->successful()) {
+                return $res->json("statistics.{$mangaId}");
+            }
+        } catch (\Exception $e) {
+            Log::warning("Failed to fetch statistics for {$mangaId}: {$e->getMessage()}");
+        }
+
+        return null;
+    }
  
     public function sync($limit = 20) 
     { 
@@ -231,7 +442,7 @@ class ComicService
             'hentai'
         ];
 
-        $tags = collect($temi['attributes']['tags'] ?? [])
+        $tags = collect($item['attributes']['tags'] ?? [])
             ->pluck('attributes.name.en')
             ->map(fn($t) => strtolower($t))
             ->toArray();

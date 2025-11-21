@@ -16,5 +16,7 @@ class Comic extends Model
         'is_sensitive',
         'last_update',
         'last_chapter',
+        'rating',          
+        'rating_count',    
     ];
 }

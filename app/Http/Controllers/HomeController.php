@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Comic;
 use App\Models\GlobalChat;
+use App\Models\User;
+use App\Services\ComicService;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(ComicService $comicService)
     {
-        $user = auth()->user();
+        /** @var User|null $user */
+        $user = Auth::user();
 
         // Ambil komik sesuai censorship
         $query = Comic::orderByDesc('last_update');
@@ -25,6 +29,10 @@ class HomeController extends Controller
                     ->orderBy('created_at', 'asc')
                     ->get();
 
-        return view('home', compact('comics', 'chats'));
+        // ✅ GANTI: Gunakan service untuk top ranks
+        $censorshipEnabled = !$user || ($user && $user->censorship_enabled);
+        $topRanks = $comicService->getTopRankedComics(10, $censorshipEnabled);
+
+        return view('home', compact('comics', 'chats', 'topRanks'));
     }
 }
