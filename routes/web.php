@@ -19,6 +19,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/comics/{mangadex_id}', [ComicController::class, 'show'])
      ->name('comic.show');
 
+// Reader route for chapter pages (uses MangaDex at-home CDN)
+Route::get('/comics/{mangadex_id}/chapter/{chapterId}', [App\Http\Controllers\ComicController::class, 'chapter'])
+    ->name('comic.chapter');
+
 
 // =============================================
 // AUTH ROUTES

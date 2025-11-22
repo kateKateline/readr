@@ -244,6 +244,85 @@ class ComicService
 
         return null;
     }
+
+    /**
+     * Fetch chapters for a manga from MangaDex API.
+     * Returns an array of chapters with keys: id, chapter, chapter_num, translatedLanguage, readableAt
+     *
+     * @param string $mangaId
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     */
+    public function getChapters(string $mangaId, int $limit = 200, int $offset = 0): array
+    {
+        $url = "{$this->base}/chapter?manga={$mangaId}&limit={$limit}&offset={$offset}&order[chapter]=asc&includeFutureUpdates=0";
+
+        try {
+            $res = Http::timeout(15)->get($url);
+        } catch (\Exception $e) {
+            Log::warning("Failed to fetch chapters for {$mangaId}: {$e->getMessage()}");
+            return [];
+        }
+
+        if (!$res->successful() || empty($res->json('data'))) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($res->json('data', []) as $chapter) {
+            $attr = $chapter['attributes'] ?? [];
+            $raw = $attr['chapter'] ?? null;
+
+            $out[] = [
+                'id' => $chapter['id'] ?? null,
+                'chapter' => $raw ?? 'N/A',
+                'chapter_num' => $this->parseChapterValue($raw),
+                'translatedLanguage' => $attr['translatedLanguage'] ?? null,
+                'readableAt' => $attr['readableAt'] ?? $attr['publishAt'] ?? $attr['createdAt'] ?? null,
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Fetch chapter page URLs from MangaDex at-home server for a given chapter id.
+     * Returns an array of full page URLs (CDN) or empty array on failure.
+     *
+     * @param string $chapterId
+     * @return array
+     */
+    public function getChapterPages(string $chapterId): array
+    {
+        $url = "{$this->base}/at-home/server/{$chapterId}";
+
+        try {
+            $res = Http::timeout(15)->get($url);
+        } catch (\Exception $e) {
+            Log::warning("Failed to fetch at-home server for {$chapterId}: {$e->getMessage()}");
+            return [];
+        }
+
+        if (!$res->successful()) {
+            return [];
+        }
+
+        $base = rtrim($res->json('baseUrl', ''), '/');
+        $hash = $res->json('chapter.hash');
+        $data = $res->json('chapter.data', []);
+
+        if (empty($base) || empty($hash) || empty($data)) {
+            return [];
+        }
+
+        $pages = [];
+        foreach ($data as $p) {
+            $pages[] = "{$base}/data/{$hash}/{$p}";
+        }
+
+        return $pages;
+    }
  
 
     // Base sync manga
