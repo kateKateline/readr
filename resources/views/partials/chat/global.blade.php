@@ -10,7 +10,7 @@
     </div>
 
     {{-- Chat messages --}}
-    <div class="flex-1 overflow-y-auto px-3 py-3 space-y-0 chat-scrollbar">
+    <div class="flex-1 overflow-y-auto px-3 py-3 space-y-0 thin-scrollbar-dark chat-scrollbar">
         @forelse ($chats as $chat)
             <div class="flex gap-2.5 py-2.5 px-2 transition animate-fadeIn border-b border-white last:border-b-0">
                 <!-- Avatar Profile -->
@@ -81,48 +81,3 @@
         </form>
     </div>
 </div>
-
-<style>
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-fadeIn {
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* Custom scrollbar untuk chat */
-.chat-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: #30363d transparent;
-}
-
-.chat-scrollbar::-webkit-scrollbar {
-    width: 6px;
-}
-
-.chat-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.chat-scrollbar::-webkit-scrollbar-thumb {
-    background: #30363d;
-    border-radius: 3px;
-}
-
-.chat-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #484f58;
-}
-
-/* Auto scroll ke bawah untuk chat baru */
-.chat-scrollbar {
-    scroll-behavior: smooth;
-}
-</style>

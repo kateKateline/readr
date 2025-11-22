@@ -1,3 +1,56 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* Shared thin dark scrollbar used by top ranks and chat */
+.thin-scrollbar-dark {
+    scrollbar-width: thin;
+    scrollbar-color: #30363d transparent;
+    scroll-behavior: smooth;
+}
+
+.thin-scrollbar-dark::-webkit-scrollbar {
+    width: 6px;
+}
+
+.thin-scrollbar-dark::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.thin-scrollbar-dark::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 3px;
+}
+
+.thin-scrollbar-dark::-webkit-scrollbar-thumb:hover {
+    background: #484f58;
+}
+
+
+/* Chat Global Start */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Chat will reuse the shared .thin-scrollbar-dark class */
+/*  Chat Global End */
+
+
+
+/*  Dropdown Profile Start */
+[x-cloak] {
+    display: none !important;
+}
+/*  Dropdown Profile End */

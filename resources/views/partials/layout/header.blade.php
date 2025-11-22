@@ -52,6 +52,7 @@
 
                     <!-- Dropdown menu -->
                     <div x-show="open" 
+                         x-cloak
                          @click.away="open = false" 
                          x-transition:enter="transition ease-out duration-100"
                          x-transition:enter-start="opacity-0 scale-95"
@@ -60,7 +61,6 @@
                          x-transition:leave-start="opacity-100 scale-100"
                          x-transition:leave-end="opacity-0 scale-95"
                          class="absolute right-0 mt-2 w-48 bg-[#161b22] border border-[#21262d] rounded-lg shadow-xl z-50 overflow-hidden">
-                        
                         <!-- Menu items -->
                         <div class="py-1">
                             <a href="{{ route('profile', Auth::user()->id) }}" 

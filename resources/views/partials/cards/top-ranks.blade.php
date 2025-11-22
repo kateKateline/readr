@@ -12,7 +12,7 @@
     </div>
 
     {{-- Top Ranks List --}}
-    <div class="flex-1 overflow-y-auto px-3 py-2 space-y-0 top-ranks-scrollbar">
+    <div class="flex-1 overflow-y-auto px-3 py-2 space-y-0 thin-scrollbar-dark">
         @forelse ($topRanks as $index => $comic)
             <a href="{{ route('comic.show', $comic->mangadex_id) }}" 
                class="flex gap-3 py-2.5 px-2 hover:bg-[#1c2128] rounded-lg transition group border-b border-[#21262d] last:border-b-0">
@@ -20,15 +20,14 @@
                 {{-- Rank Number --}}
                 <div class="flex-shrink-0 flex items-center justify-center w-8">
                     @if($index < 3)
-                        {{-- Trophy untuk top 3 --}}
-                        <div class="text-xl font-bold">
-                            @if($index === 0)
-                                🥇
-                            @elseif($index === 1)
-                                🥈
-                            @elseif($index === 2)
-                                🥉
-                            @endif
+                        {{-- Tampilkan angka untuk posisi 1-3 sebagai teks sederhana dengan warna khusus --}}
+                        @php
+                            $posClass = $index === 0
+                                ? 'text-yellow-400'
+                                : ($index === 1 ? 'text-slate-300' : 'text-amber-600');
+                        @endphp
+                        <div class="text-sm font-bold {{ $posClass }}">
+                            {{ $index + 1 }}
                         </div>
                     @else
                         {{-- Number untuk sisanya --}}
@@ -128,31 +127,3 @@
     </div>
 </div>
 
-<style>
-/* Custom scrollbar untuk top ranks */
-.top-ranks-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: #30363d transparent;
-}
-
-.top-ranks-scrollbar::-webkit-scrollbar {
-    width: 6px;
-}
-
-.top-ranks-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.top-ranks-scrollbar::-webkit-scrollbar-thumb {
-    background: #30363d;
-    border-radius: 3px;
-}
-
-.top-ranks-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #484f58;
-}
-
-.top-ranks-scrollbar {
-    scroll-behavior: smooth;
-}
-</style>
