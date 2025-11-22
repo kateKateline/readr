@@ -10,10 +10,13 @@
             <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 gap-3">
                 @include('partials.cards.comic')
             </div>
-
             @if($comics->isEmpty())
                 <div class="text-center py-20">
                     <p class="text-gray-500 text-lg">No comics found.</p>
+                </div>
+            @else
+                <div class="mt-4">
+                    {{ $comics->links('vendor.pagination.custom') }}
                 </div>
             @endif
         </div>
