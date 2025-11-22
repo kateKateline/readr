@@ -1,4 +1,4 @@
-<div class="bg-[#161b22] border border-[#30363d] rounded-lg shadow-xl overflow-hidden flex flex-col" style="height: 400px;">
+<div class="bg-[#161b22] border border-[#30363d] rounded-lg shadow-xl overflow-hidden flex flex-col" style="height: 500px;">
     
     {{-- Header --}}
     <div class="border-b border-[#21262d] px-4 py-3 bg-[#0d1117] flex-shrink-0">
