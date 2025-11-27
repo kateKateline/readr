@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ComicController;
 use App\Http\Controllers\GlobalChatController;
+use App\Http\Controllers\ChapterController;
 
 Route::post('/global-chat', [GlobalChatController::class, 'store'])
      ->name('global-chat.store');
@@ -16,12 +17,13 @@ Route::post('/global-chat', [GlobalChatController::class, 'store'])
 // PUBLIC ROUTES
 // =============================================
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/comics/{mangadex_id}', [ComicController::class, 'show'])
-     ->name('comic.show');
 
-// Reader route for chapter pages (uses MangaDex at-home CDN)
-Route::get('/comics/{mangadex_id}/chapter/{chapterId}', [App\Http\Controllers\ComicController::class, 'chapter'])
-    ->name('comic.chapter');
+Route::get('/comic/{comic:mangadex_id}', [ComicController::class, 'show'])
+    ->name('comic.show');
+
+Route::get('/chapter/{chapter}', [ChapterController::class, 'read'])
+    ->name('chapter.read');
+
 
 
 // =============================================
