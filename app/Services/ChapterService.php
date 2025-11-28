@@ -14,30 +14,34 @@ class ChapterService
 
     /**
      * Sync chapters untuk sebuah manga (mengambil juga translatedLanguage per chapter)
-     *
-     * @param string $mangaId Mangadex manga id
-     * @param string $language kode bahasa yang ingin diambil (default "en")
-     * @return bool
      */
-    public function syncChapters(string $mangaId, string $language = "en"): bool
+    public function syncChapters(string $mangaId, ?string $language = null): array
     {
         $limit = 50;
         $offset = 0;
         $total = 1;
+        $syncedCount = 0;
+        $failedCount = 0;
 
         $comic = Comic::where('mangadex_id', $mangaId)->first();
 
         if (!$comic) {
             Log::error("Comic tidak ditemukan: {$mangaId}");
-            return false;
+            return ['success' => false, 'synced' => 0, 'failed' => 0];
         }
 
         while ($offset < $total) {
-            $url = "{$this->base}/chapter?manga={$mangaId}&translatedLanguage[]={$language}"
-                 . "&limit={$limit}&offset={$offset}&order[chapter]=asc";
+
+            // Jika language di-set, filter berdasarkan language, jika tidak ambil semua
+            $url = "{$this->base}/chapter?manga={$mangaId}";
+            
+            if ($language) {
+                $url .= "&translatedLanguage[]={$language}";
+            }
+            
+            $url .= "&limit={$limit}&offset={$offset}&order[chapter]=asc";
 
             try {
-                // retry 2x on transient failures, 10s timeout
                 $response = Http::retry(2, 1000)->timeout(10)->get($url);
             } catch (RequestException $e) {
                 Log::warning("Gagal fetch chapters (exception): " . $e->getMessage());
@@ -53,28 +57,78 @@ class ChapterService
             $total = $payload['total'] ?? 0;
 
             if (empty($payload['data'])) {
-                // tidak ada data pada response
                 break;
             }
 
             foreach ($payload['data'] as $c) {
-                $chapterId = $c['id'] ?? null;
-                $attr      = $c['attributes'] ?? [];
 
-                if (!$chapterId) {
-                    // skip jika data buruk
-                    continue;
+                $chapterId = $c['id'] ?? null;
+                $attr = $c['attributes'] ?? [];
+
+                if (!$chapterId) continue;
+
+                /*
+                |--------------------------------------------------------------------------
+                | NORMALISASI CHAPTER NUMBER
+                |--------------------------------------------------------------------------
+                */
+                $chapterNumber = $attr['chapter'] ?? null;
+
+                if ($chapterNumber !== null) {
+                    // Hilangkan trailing zero → "1.0" jadi "1", "5.50" jadi "5.5"
+                    // Tapi tetap pertahankan nilai aslinya termasuk "0"
+                    $chapterNumber = rtrim(rtrim($chapterNumber, '0'), '.');
+                    
+                    // Jika setelah rtrim jadi string kosong, kembalikan ke "0"
+                    if ($chapterNumber === '') {
+                        $chapterNumber = "0";
+                    }
                 }
 
-                $chapterTitle  = $attr['title'] ?? null;
-                $chapterNumber = $attr['chapter'] ?? null;
+                /*
+                |--------------------------------------------------------------------------
+                | FIX TITLE - Ambil dari bahasa apapun yang tersedia
+                |--------------------------------------------------------------------------
+                */
+                $chapterTitle = $attr['title'] ?? null;
+
+                // Jika title adalah string dan tidak kosong, gunakan apa adanya
+                if (is_string($chapterTitle) && trim($chapterTitle) !== "" && mb_strlen(trim($chapterTitle)) > 0) {
+                    $chapterTitle = trim($chapterTitle);
+                } 
+                // Jika title adalah array/object (multi-language), ambil dari bahasa manapun
+                elseif (is_array($chapterTitle) || is_object($chapterTitle)) {
+                    $titles = (array) $chapterTitle;
+                    $chapterTitle = $titles['en'] 
+                        ?? $titles['ja-ro']
+                        ?? $titles['ja'] 
+                        ?? $titles['id']
+                        ?? $titles['zh']
+                        ?? $titles['zh-hk']
+                        ?? $titles['ko']
+                        ?? (!empty($titles) ? reset($titles) : null);
+                    
+                    // Jika masih null atau kosong setelah ambil dari array
+                    if (!$chapterTitle || trim($chapterTitle) === "") {
+                        $chNum = $chapterNumber ?? "Unknown";
+                        $chapterTitle = "Chapter " . $chNum;
+                    } else {
+                        $chapterTitle = trim($chapterTitle);
+                    }
+                } 
+                // Jika benar-benar null atau kosong, gunakan default
+                else {
+                    $chNum = $chapterNumber ?? "Unknown";
+                    $chapterTitle = "Chapter " . $chNum;
+                }
+
                 $chapterVolume = $attr['volume'] ?? null;
                 $translatedLanguage = $attr['translatedLanguage'] ?? null;
 
                 /*
-                |------------------------------------------------------------------
+                |--------------------------------------------------------------------------
                 | Fetch At-Home server (image data)
-                |------------------------------------------------------------------
+                |--------------------------------------------------------------------------
                 */
                 try {
                     $atHome = Http::timeout(10)->get("https://api.mangadex.org/at-home/server/{$chapterId}");
@@ -85,61 +139,68 @@ class ChapterService
 
                 if ($atHome && $atHome->successful()) {
                     $img = $atHome->json();
-                    $hash       = $img['chapter']['hash'] ?? null;
+
+                    $hash = $img['chapter']['hash'] ?? null;
                     $dataImages = $img['chapter']['data'] ?? [];
-                    $dataSaver  = $img['chapter']['dataSaver'] ?? [];
+                    $dataSaver = $img['chapter']['dataSaver'] ?? [];
+
                 } else {
-                    $hash       = null;
+                    $hash = null;
                     $dataImages = [];
-                    $dataSaver  = [];
+                    $dataSaver = [];
                 }
 
                 /*
-                |------------------------------------------------------------------
-                | Save Chapter
-                |------------------------------------------------------------------
+                |--------------------------------------------------------------------------
+                | Save Chapter - Hanya pakai publish_at
+                |--------------------------------------------------------------------------
                 */
                 try {
                     Chapter::updateOrCreate(
                         ['mangadex_id' => $chapterId],
                         [
                             'comic_id'            => $comic->id,
-                            'title'               => $chapterTitle,
-                            'chapter_number'      => $chapterNumber,
+                            'title'               => $chapterTitle,         
+                            'chapter_number'      => $chapterNumber,        
                             'volume'              => $chapterVolume,
                             'publish_at'          => $this->toMysqlDatetime($attr['publishAt'] ?? null),
-                            'translated_language' => $translatedLanguage, // disimpan di sini
+                            'translated_language' => $translatedLanguage,
                             'external_url'        => $attr['externalUrl'] ?? null,
                             'is_unavailable'      => empty($dataImages),
-                            'md_updated_at'       => $this->toMysqlDatetime($attr['updatedAt'] ?? null),
                             'hash'                => $hash,
                             'data'                => $dataImages,
                             'data_saver'          => $dataSaver,
                             'pages'               => count($dataImages),
                         ]
                     );
+                    
+                    $syncedCount++;
                 } catch (\Throwable $e) {
                     Log::error("Gagal simpan chapter {$chapterId}: " . $e->getMessage());
-                    // lanjutkan ke chapter selanjutnya
+                    $failedCount++;
                 }
 
-                // jeda kecil untuk mengurangi kemungkinan kena rate limit
-                usleep(250000); // 0.25s
+                // Jeda untuk menghindari rate limit
+                usleep(250000);
             }
 
             $offset += $limit;
         }
 
-        return true;
+        return [
+            'success' => true,
+            'synced' => $syncedCount,
+            'failed' => $failedCount,
+            'total' => $syncedCount + $failedCount
+        ];
     }
 
     /**
-     * Convert ISO8601 (MangaDex datetime) ke MySQL datetime
+     * Convert ISO8601 ke MySQL datetime
      */
     private function toMysqlDatetime(?string $date): ?string
     {
         if (!$date) return null;
-
         return date('Y-m-d H:i:s', strtotime($date));
     }
 }

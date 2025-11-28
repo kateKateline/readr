@@ -8,7 +8,7 @@ use App\Services\ChapterService;
 
 class SyncChapters extends Command
 {
-    protected $signature = 'sync:chapters {comicId} {--lang=en}';
+    protected $signature = 'sync:chapters {comicId} {--lang= : Language code (optional, e.g., en, id, zh, ja). Leave empty to sync all languages}';
 
     protected $description = 'Sync chapters for a specific MangaDex comic';
 
@@ -21,15 +21,45 @@ class SyncChapters extends Command
 
         if (!$comic) {
             $this->error("Comic tidak ditemukan di DB!");
-            return;
+            return Command::FAILURE;
         }
 
         $this->info("Sync chapters for: {$comic->title}");
         $this->info("MangaDex ID: $comicId");
+        
+        if ($lang) {
+            $this->info("Language: $lang");
+        } else {
+            $this->info("Language: ALL (semua bahasa)");
+        }
+        
+        $this->newLine();
 
-        $service->syncChapters($comicId, $lang);
+        // Tampilkan progress bar
+        $this->output->write("Syncing chapters...");
 
-        $count = $comic->chapters()->count();
-        $this->info("✔ Sync selesai! Total chapter: $count");
+        $result = $service->syncChapters($comicId, $lang);
+
+        if (!$result['success']) {
+            $this->error("\n✖ Sync gagal!");
+            return Command::FAILURE;
+        }
+
+        $this->newLine();
+        $this->info("✔ Sync selesai!");
+        $this->table(
+            ['Metric', 'Count'],
+            [
+                ['Berhasil disync', $result['synced']],
+                ['Gagal', $result['failed']],
+                ['Total diproses', $result['total']],
+            ]
+        );
+
+        // Tampilkan total chapter di database untuk comic ini
+        $totalInDb = $comic->chapters()->count();
+        $this->info("Total chapter di database: $totalInDb");
+
+        return Command::SUCCESS;
     }
 }
