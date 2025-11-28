@@ -1,39 +1,243 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto py-6">
-    <h1 class="text-3xl font-bold mb-4">{{ $comic->title }}</h1>
+<div class="max-w-7xl mx-auto px-6 py-12 text-[#c9d1d9]">
+    
+    {{-- Header Section (Cover, Title, Tags, Synopsis, Rating, Details) --}}
+    <div class="flex flex-col md:flex-row gap-6 mb-8 p-6 bg-[#161b22] border border-[#30363d] rounded-md">
+        
+        {{-- Cover Image --}}
+        <div class="w-full md:w-48 flex-shrink-0">
+            <img 
+                src="{{ $comic->image ?? 'https://via.placeholder.com/192x288?text=Cover+Not+Found' }}" 
+                alt="Cover of {{ $comic->title }}" 
+                class="w-full h-auto object-cover rounded-md border border-[#30363d] aspect-[2/3]"
+            >
+        </div>
+        
+        {{-- Title, Tags, Synopsis, Details --}}
+        <div class="flex-1 min-w-0">
+            
+            <div class="flex justify-between items-start mb-4">
+                
+                {{-- Title, Author, & TAGS --}}
+                <div class="flex-1 pr-4">
+                    <h1 class="text-3xl font-semibold text-white break-words">
+                        {{ $comic->title }}
+                    </h1>
+                    <p class="text-sm text-[#8b949e] mb-2">
+                        <span class="font-medium">Author:</span> {{ $comic->author ?? 'Unknown' }}
+                    </p>
 
-    <div class="mb-6">
-        <img src="{{ $comic->image }}" alt="{{ $comic->title }}" class="w-48 rounded shadow">
+                    {{-- Tags Section --}}
+                    @php
+                        $staticTags = ['Action', 'Fantasy', 'System', 'Dungeon', 'Level Up', 'Reincarnation', 'Magic', 'Adventure', 'Isekai'];
+                        $visibleTagsCount = 3;
+                    @endphp
+                    <div id="tag-container" class="flex flex-wrap gap-1 mb-4">
+                        @foreach ($staticTags as $index => $tag)
+                            <span class="tag-item inline-block px-2 py-0.5 text-xs font-medium bg-[#21262d] text-[#58a6ff] rounded-full border border-[#30363d] {{ $index >= $visibleTagsCount ? 'hidden' : '' }}" data-tag-index="{{ $index }}">
+                                {{ $tag }}
+                            </span>
+                        @endforeach
+                        
+                        @if (count($staticTags) > $visibleTagsCount)
+                            <button id="show-more-tags" class="px-2 py-0.5 text-xs font-medium bg-[#21262d] text-[#8b949e] rounded-full border border-[#30363d] hover:text-white transition-colors">
+                                ...
+                            </button>
+                        @endif
+                    </div>
+                </div>
+                
+                {{-- Rating --}}
+                <div class="flex-shrink-0 text-center ml-4">
+                    <div class="w-14 h-14 rounded-full bg-green-600 flex items-center justify-center border-2 border-green-400">
+                        <span class="text-xl font-bold text-white">
+                            {{ number_format($comic->rating ?? 0.0, 1) }}
+                        </span>
+                    </div>
+                    <p class="text-xs text-[#8b949e] mt-1">{{ $comic->rating_count ?? 0 }} Votes</p>
+                </div>
+            </div>
+            
+            {{-- Sinopsis --}}
+            <div class="mb-6">
+                <h2 class="text-lg font-medium mb-1 text-white">Synopsis</h2>
+                <p class="text-[#c9d1d9] text-sm leading-relaxed text-ellipsis">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </p>
+            </div>
+
+            {{-- Details Section (Status, Type, Released, Timestamps) --}}
+            <div class="grid grid-cols-2 gap-y-1 gap-x-4 text-sm">
+                <p class="text-[#8b949e]"><span class="font-medium text-white">Status:</span> {{ $comic->status ?? 'N/A' }}</p>
+                <p class="text-[#8b949e]"><span class="font-medium text-white">Type:</span> {{ $comic->type ?? 'N/A' }}</p>
+                <p class="text-[#8b949e]"><span class="font-medium text-white">Released:</span> {{ \Carbon\Carbon::parse($comic->created_at)->year ?? 'N/A' }}</p>
+                <p class="text-[#8b949e]"><span class="font-medium text-white">Updated At:</span> {{ $comic->last_update ? \Carbon\Carbon::parse($comic->last_update)->diffForHumans() : 'N/A' }}</p>
+                <p class="text-[#8b949e]"><span class="font-medium text-white">Added At:</span> {{ $comic->created_at ? \Carbon\Carbon::parse($comic->created_at)->diffForHumans() : 'N/A' }}</p>
+            </div>
+
+        </div>
     </div>
+    
+    {{-- Chapter List Section --}}
+    <div class="bg-[#161b22] border border-[#30363d] rounded-md">
 
-    <h2 class="text-xl font-bold mb-3">Chapters</h2>
+        {{-- Language Tabs & Sort By --}}
+        <div class="flex justify-between border-b border-b-[#30363d] px-6 pt-4 pb-0 overflow-x-auto whitespace-nowrap">
+            
+            {{-- Language Tabs --}}
+            <nav class="flex space-x-2 flex-shrink-0" role="tablist">
+                @foreach ($availableLanguages as $lang)
+                    @php
+                        $langName = strtoupper($lang);
+                        if ($lang === 'en') $langName = 'English';
+                        if ($lang === 'id') $langName = 'Indonesia';
+                    @endphp
+                    <button 
+                        id="tab-{{ $lang }}"
+                        data-lang="{{ $lang }}"
+                        class="tab-btn py-2 px-4 text-sm font-medium border-b-2 
+                                {{ $lang === $defaultLanguage ? 'border-orange-500 text-white' : 'border-transparent text-[#8b949e] hover:text-white hover:border-[#8b949e]' }} 
+                                focus:outline-none transition-colors duration-150"
+                        role="tab" 
+                        aria-controls="panel-{{ $lang }}" 
+                        aria-selected="{{ $lang === $defaultLanguage ? 'true' : 'false' }}"
+                    >
+                        {{ $langName }} ({{ $chaptersByLanguage[$lang]->count() }})
+                    </button>
+                @endforeach
+            </nav>
+            
+            {{-- Sort By Button (Kanan) --}}
+            <div class="relative inline-block text-left ml-4 pb-2">
+                <button type="button" id="sort-menu-button" class="inline-flex justify-center w-full rounded-md border border-[#30363d] shadow-sm px-4 py-2 bg-[#21262d] text-sm font-medium text-[#c9d1d9] hover:bg-[#30363d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#161b22] focus:ring-orange-500 transition-colors">
+                    Sort By: <span id="current-sort-label" class="ml-1 font-bold">Chapter</span>
+                    <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
 
-    <table class="table-auto w-full border border-gray-700">
-        <thead class="bg-gray-800 text-gray-200">
-            <tr>
-                <th class="px-4 py-2">Chapter</th>
-                <th class="px-4 py-2">Title</th>
-                <th class="px-4 py-2">Updated</th>
-                <th class="px-4 py-2">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($chapters as $chapter)
-                <tr class="border-t border-gray-700">
-                    <td class="px-4 py-2">{{ $chapter->chapter_number }}</td>
-                    <td class="px-4 py-2">{{ $chapter->title ?? '-' }}</td>
-                    <td class="px-4 py-2">{{ $chapter->updated_at->diffForHumans() }}</td>
-                    <td class="px-4 py-2">
-                        <a href="{{ route('chapter.read', $chapter->id) }}" 
-                           class="bg-blue-600 text-white px-3 py-1 rounded">
-                           Open
-                        </a>
-                    </td>
-                </tr>
+                <div id="sort-menu" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-[#21262d] ring-1 ring-[#30363d] ring-opacity-5 focus:outline-none z-10 hidden" role="menu" aria-orientation="vertical" aria-labelledby="sort-menu-button" tabindex="-1">
+                    <div class="py-1" role="none">
+                        <a href="#" data-sort="chapter" class="sort-option text-[#c9d1d9] block px-4 py-2 text-sm hover:bg-[#30363d]" role="menuitem" tabindex="-1" id="sort-chapter">Chapter (Default)</a>
+                        <a href="#" data-sort="volume" class="sort-option text-[#c9d1d9] block px-4 py-2 text-sm hover:bg-[#30363d]" role="menuitem" tabindex="-1" id="sort-volume">Volume</a>
+                        <a href="#" data-sort="alternate_link" class="sort-option text-[#c9d1d9] block px-4 py-2 text-sm hover:bg-[#30363d]" role="menuitem" tabindex="-1" id="sort-alternate_link">Has Alternate Link</a>
+                        <a href="#" data-sort="available" class="sort-option text-[#c9d1d9] block px-4 py-2 text-sm hover:bg-[#30363d]" role="menuitem" tabindex="-1" id="sort-available">No Alternate Link</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Chapter Content --}}
+        <div class="p-4">
+            @foreach ($availableLanguages as $lang)
+                <div 
+                    id="panel-{{ $lang }}"
+                    role="tabpanel"
+                    aria-labelledby="tab-{{ $lang }}"
+                    class="chapter-panel {{ $lang === $defaultLanguage ? 'block' : 'hidden' }} space-y-1"
+                >
+                    @php
+                        // Kelompokkan chapter berdasarkan volume, lalu chapter_number
+                        $chaptersGrouped = $chaptersByLanguage[$lang]
+                            ->groupBy('volume')
+                            ->sortKeys();
+                    @endphp
+                    
+                    <div class="chapter-list-container space-y-3" data-lang="{{ $lang }}">
+                        @forelse ($chaptersGrouped as $volume => $volumeChapters)
+                            
+                            {{-- Volume Header --}}
+                            <div class="volume-section" data-volume="{{ $volume ?? 'none' }}">
+                                <div class="text-sm font-semibold text-orange-500 mb-2 px-2">
+                                    Volume {{ $volume ?? 'N/A' }}
+                                </div>
+                                
+                                {{-- Chapters dalam Volume ini --}}
+                                <div class="space-y-1">
+                                    @php
+                                        $chaptersByNumber = $volumeChapters->groupBy('chapter_number');
+                                    @endphp
+                                    
+                                    @foreach ($chaptersByNumber as $chapterNumber => $chapters)
+                                        @php
+                                            $hasAltLink = $chapters->contains(function($ch) {
+                                                return !empty($ch->external_url);
+                                            });
+                                        @endphp
+                                        
+                                        @if ($chapters->count() > 1)
+                                            {{-- Jika ada lebih dari 1 versi (Dropdown) --}}
+                                            <div class="relative chapter-dropdown" data-chapter-number="{{ $chapterNumber }}" data-volume="{{ $volume ?? 'none' }}" data-has-alt="{{ $hasAltLink ? 'true' : 'false' }}">
+                                                <button class="w-full flex justify-between items-center p-2.5 text-sm bg-[#21262d] hover:bg-[#30363d] rounded-md border border-[#30363d] text-white transition-colors">
+                                                    <span class="font-medium pr-2">
+                                                        Chapter {{ $chapterNumber }}: {{ $chapters->first()->title ?? 'Multiple Versions' }} ({{ $chapters->count() }} versions)
+                                                    </span>
+                                                    <span class="text-xs text-[#8b949e] ml-auto flex items-center">
+                                                        <svg class="w-3.5 h-3.5 transition-transform transform rotate-0 dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                                    </span>
+                                                </button>
+                                                
+                                                {{-- Dropdown Content - Ukuran lebih kecil dan tidak menutupi --}}
+                                                <div class="dropdown-content hidden mt-1 bg-[#0d1117] border border-[#30363d] rounded-md shadow-xl max-h-64 overflow-y-auto" style="margin-left: 1rem; width: calc(100% - 1rem);">
+                                                    @foreach ($chapters as $chapter)
+                                                        <a 
+                                                            href="{{ $chapter->external_url ?: route('chapter.read', ['chapter' => $chapter->id]) }}" 
+                                                            class="block p-2.5 text-xs hover:bg-[#161b22] border-b border-b-[#21262d] last:border-b-0 transition-colors"
+                                                            target="{{ $chapter->external_url ? '_blank' : '_self' }}"
+                                                        >
+                                                            <div class="flex items-start justify-between">
+                                                                <div class="flex-1">
+                                                                    <span class="text-white font-medium block mb-1">
+                                                                        {{ $chapter->title ?: 'No Title' }}
+                                                                    </span>
+                                                                    <span class="text-[#8b949e] text-[10px]">
+                                                                        @if ($chapter->external_url)
+                                                                            <span class="text-yellow-400">⚠ Alternate Link</span>
+                                                                        @else
+                                                                            <span class="text-green-400">✓ Available</span>
+                                                                        @endif
+                                                                    </span>
+                                                                </div>
+                                                                <span class="text-[10px] text-[#6e7681] ml-2 whitespace-nowrap">
+                                                                    {{ \Carbon\Carbon::parse($chapter->publish_at)->format('M d, Y') }}
+                                                                </span>
+                                                            </div>
+                                                        </a>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @else
+                                            {{-- Jika hanya 1 versi (Single Link) --}}
+                                            @php $chapter = $chapters->first(); @endphp
+                                            <a 
+                                                href="{{ route('chapter.read', ['chapter' => $chapter->id]) }}" 
+                                                class="chapter-single flex justify-between items-center p-2.5 text-sm hover:bg-[#21262d] rounded-md transition-colors duration-150 border border-transparent hover:border-[#30363d]"
+                                                data-chapter-number="{{ $chapterNumber }}" 
+                                                data-volume="{{ $volume ?? 'none' }}" 
+                                                data-has-alt="{{ $chapter->external_url ? 'true' : 'false' }}"
+                                            >
+                                                <span class="font-medium text-white break-all pr-2">
+                                                    Chapter {{ $chapter->chapter_number }}: {{ $chapter->title ?? 'No Title' }}
+                                                </span>
+                                                <span class="text-xs text-[#8b949e] flex-shrink-0 ml-auto">
+                                                    {{ \Carbon\Carbon::parse($chapter->publish_at)->diffForHumans() }}
+                                                </span>
+                                            </a>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+
+                        @empty
+                            <p class="text-center py-4 text-[#8b949e]">No chapters available in this language.</p>
+                        @endforelse
+                    </div>
+
+                </div>
             @endforeach
-        </tbody>
-    </table>
+        </div>
+    </div>
 </div>
-@endsection
+@endsection 
