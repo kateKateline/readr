@@ -1,5 +1,5 @@
 composer install
-npm  install
+npm install
 
 cp .env.example .env
 php artisan key:generate    
@@ -9,6 +9,7 @@ php artisan key:generate
 php artisan sync:comics
 php artisan sync:toprated
 php artisan globalchat:reset
+php artisan sync:chapters mangadex_id --lang=en
 
 =======documentation========
 
@@ -21,7 +22,8 @@ api intergrated, not yet finished
 11/19/2025 -h
 fix bug and adding some ui elements
 
-9:22AM 11/20/2025 -s
-censorship feature 
+11/20/2025 -s
+censorship feature
 
-php artisan sync:chapters 32d76d19-8a05-4db0-9fc2-e0b0648fe9d0 --lang=en
+11/28/2025 -h
+for the past week i mmanage to make a show chapter feature, need some ui update and just a lot of shit things to do
