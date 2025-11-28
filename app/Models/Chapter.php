@@ -13,6 +13,7 @@ class Chapter extends Model
         'chapter_number',
         'volume',
         'publish_at',
+        'translated_language',
         'external_url',
         'is_unavailable',
         'md_updated_at',
@@ -21,6 +22,7 @@ class Chapter extends Model
         'data_saver',
         'pages',
     ];
+
 
     protected $casts = [
         'data' => 'array',
@@ -41,8 +43,4 @@ class Chapter extends Model
         return $this->belongsTo(Comic::class);
     }
 
-    public function panels()
-    {
-        return $this->hasMany(ChapterPanel::class);
-    }
 }
