@@ -28,6 +28,5 @@ censorship feature
 11/28/2025 -h
 for the past week i mmanage to make a show chapter feature, need some ui update and just a lot of shit things to do
 
-11/29/1025 --h
-
-bg-[#161b22] border border-[#30363d] rounded-md
+11/29/1025 -h
+ui element show is done 

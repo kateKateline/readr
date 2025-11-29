@@ -37,7 +37,7 @@ class ComicController extends Controller
             'fi' => 'Finnish',
             'no' => 'Norwegian',
             'da' => 'Danish',
-            'he' => 'Hebrew',
+            'he' => 'Ibrrai',
             'ka'=> 'Georgian',
             'pt-br' => 'portuguese (Brazil)',
             // tambahkan jika butuh lagi
