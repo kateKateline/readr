@@ -1,195 +1,151 @@
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- LOGIC TAGS SHOW/HIDE ---
-        const showMoreButton = document.getElementById('show-more-tags');
-        const hiddenTags = document.querySelectorAll('.tag-item');
-        const visibleTagsCount = 3; 
+document.addEventListener("DOMContentLoaded", function () {
+    // --- 1. Tags Show/Hide Logic (Show More) ---
+    const showMoreTagsButton = document.getElementById("show-more-tags");
+    const tagItems = document.querySelectorAll(".tag-item");
+    let tagsExpanded = false;
 
-        if (showMoreButton) {
-            showMoreButton.addEventListener('click', function() {
-                hiddenTags.forEach(tag => {
-                    if (parseInt(tag.getAttribute('data-tag-index')) >= visibleTagsCount) {
-                        tag.classList.remove('hidden');
-                    }
-                });
-                this.classList.add('hidden');
-            });
-        }
-        
-        // --- LOGIC PERGANTIAN TAB ---
-        const tabButtons = document.querySelectorAll('.tab-btn');
-        const chapterPanels = document.querySelectorAll('.chapter-panel');
-
-        tabButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const selectedLang = this.getAttribute('data-lang');
-
-                tabButtons.forEach(btn => {
-                    btn.classList.remove('border-orange-500', 'text-white');
-                    btn.classList.add('border-transparent', 'text-[#8b949e]', 'hover:text-white', 'hover:border-[#8b949e]');
-                    btn.setAttribute('aria-selected', 'false');
-                });
-
-                this.classList.add('border-orange-500', 'text-white');
-                this.classList.remove('border-transparent', 'text-[#8b949e]', 'hover:text-white', 'hover:border-[#8b949e]');
-                this.setAttribute('aria-selected', 'true');
-
-                chapterPanels.forEach(panel => {
-                    panel.classList.add('hidden');
-                });
-
-                const targetPanel = document.getElementById(`panel-${selectedLang}`);
-                if (targetPanel) {
-                    targetPanel.classList.remove('hidden');
-                    // Reset sorting saat tab diganti
-                    document.getElementById('current-sort-label').textContent = 'Chapter';
-                    applySorting(targetPanel.querySelector('.chapter-list-container'), 'chapter'); 
+    if (showMoreTagsButton) {
+        showMoreTagsButton.addEventListener("click", function () {
+            tagsExpanded = !tagsExpanded;
+            tagItems.forEach((tag) => {
+                const index = parseInt(tag.dataset.tagIndex);
+                if (index >= 3) {
+                    tag.classList.toggle("hidden", !tagsExpanded);
                 }
             });
+            showMoreTagsButton.textContent = tagsExpanded ? "<" : ">";
         });
+    }
 
-        // --- LOGIC CHAPTER DROPDOWN ---
-        document.addEventListener('click', function(e) {
-            const dropdownButton = e.target.closest('.chapter-dropdown button');
-            
-            if (dropdownButton) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const dropdown = dropdownButton.closest('.chapter-dropdown');
-                const dropdownContent = dropdown.querySelector('.dropdown-content');
-                const arrow = dropdown.querySelector('.dropdown-arrow');
-                
-                // Tutup semua dropdown lain
-                document.querySelectorAll('.chapter-dropdown .dropdown-content').forEach(content => {
-                    if (content !== dropdownContent) {
-                        content.classList.add('hidden');
-                        content.closest('.chapter-dropdown').querySelector('.dropdown-arrow').classList.remove('rotate-180');
+    // --- 2. Language Tab Logic ---
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const defaultLanguage = "{{ $defaultLanguage }}";
+
+    // Fungsi untuk inisialisasi Dropdown (diperlukan saat tab beralih atau sorting)
+    function initializeDropdowns() {
+        const dropdownButtons = document.querySelectorAll(
+            ".chapter-dropdown > button"
+        );
+
+        dropdownButtons.forEach((button) => {
+            if (button.dataset.listenerAttached !== "true") {
+                button.addEventListener("click", function () {
+                    const dropdown = this.closest(".chapter-dropdown");
+                    const content = dropdown.querySelector(".dropdown-content");
+                    const arrow = dropdown.querySelector(".dropdown-arrow");
+
+                    if (content) {
+                        content.classList.toggle("hidden");
+                    }
+                    if (arrow && content) {
+                        arrow.classList.toggle(
+                            "rotate-180",
+                            !content.classList.contains("hidden")
+                        );
                     }
                 });
-                
-                // Toggle dropdown yang diklik
-                dropdownContent.classList.toggle('hidden');
-                arrow.classList.toggle('rotate-180');
-            } else if (!e.target.closest('.dropdown-content')) {
-                // Klik di luar dropdown, tutup semua
-                document.querySelectorAll('.chapter-dropdown .dropdown-content').forEach(content => {
-                    content.classList.add('hidden');
-                    content.closest('.chapter-dropdown').querySelector('.dropdown-arrow').classList.remove('rotate-180');
-                });
+                button.dataset.listenerAttached = "true";
+            }
+        });
+    }
+
+    function switchTab(selectedLang) {
+        tabButtons.forEach((btn) => {
+            const lang = btn.dataset.lang;
+            const panel = document.getElementById(`panel-${lang}`);
+            const isSelected = lang === selectedLang;
+
+            // Update Button State (Menggunakan class yang sama dengan di Blade)
+            btn.classList.toggle("border-blue-500", isSelected);
+            btn.classList.toggle("text-white", isSelected);
+            btn.classList.toggle("border-transparent", !isSelected);
+            btn.classList.toggle("text-[#8b949e]", !isSelected);
+            btn.setAttribute("aria-selected", isSelected);
+
+            // Update Panel Visibility
+            if (panel) {
+                // Menggunakan class 'block' dan 'hidden'
+                panel.classList.toggle("block", isSelected);
+                panel.classList.toggle("hidden", !isSelected);
             }
         });
 
-        // --- LOGIC SORT BY ---
-        const sortMenuButton = document.getElementById('sort-menu-button');
-        const sortMenu = document.getElementById('sort-menu');
-        const currentSortLabel = document.getElementById('current-sort-label');
+        // Inisialisasi ulang dropdown setelah mengganti tab
+        initializeDropdowns();
+    }
 
-        sortMenuButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            sortMenu.classList.toggle('hidden');
+    tabButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+            switchTab(this.dataset.lang);
         });
+    });
 
-        // Tutup sort menu saat klik di luar
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('#sort-menu-button') && !e.target.closest('#sort-menu')) {
-                sortMenu.classList.add('hidden');
+    // --- 3. Sort Menu Logic (Dropdown Sortir) ---
+    const sortMenuButton = document.getElementById("sort-menu-button");
+    const sortMenu = document.getElementById("sort-menu");
+    const sortOptions = document.querySelectorAll(".sort-option");
+    const currentSortLabel = document.getElementById("current-sort-label");
+    let currentSort = "chapter";
+
+    // Toggle Sort Menu
+    if (sortMenuButton) {
+        sortMenuButton.addEventListener("click", function (e) {
+            if (sortMenu) {
+                sortMenu.classList.toggle("hidden");
             }
         });
+    }
 
-        document.querySelectorAll('.sort-option').forEach(option => {
-            option.addEventListener('click', function(e) {
-                e.preventDefault();
-                sortMenu.classList.add('hidden');
-                const sortType = this.getAttribute('data-sort');
-                const sortLabel = this.textContent.split('(')[0].trim();
-                currentSortLabel.textContent = sortLabel;
-
-                // Temukan panel yang sedang aktif
-                const activePanel = document.querySelector('.chapter-panel:not(.hidden)');
-                if (activePanel) {
-                    const listContainer = activePanel.querySelector('.chapter-list-container');
-                    if (listContainer) {
-                        applySorting(listContainer, sortType);
-                    }
-                }
-            });
-        });
-
-        function applySorting(container, sortType) {
-            const volumeSections = Array.from(container.querySelectorAll('.volume-section'));
-            
-            if (sortType === 'volume') {
-                // Sort by volume
-                volumeSections.sort((a, b) => {
-                    const volA = a.getAttribute('data-volume');
-                    const volB = b.getAttribute('data-volume');
-                    
-                    if (volA === 'none') return 1;
-                    if (volB === 'none') return -1;
-                    
-                    return parseFloat(volA) - parseFloat(volB);
-                });
-            } else {
-                // Untuk sort lainnya, kita perlu flatten semua chapters
-                let allChapters = [];
-                
-                volumeSections.forEach(section => {
-                    const volume = section.getAttribute('data-volume');
-                    const chapters = Array.from(section.querySelectorAll('.chapter-dropdown, .chapter-single'));
-                    
-                    chapters.forEach(ch => {
-                        allChapters.push({
-                            element: ch,
-                            volume: volume,
-                            chapterNumber: parseFloat(ch.getAttribute('data-chapter-number')),
-                            hasAlt: ch.getAttribute('data-has-alt') === 'true'
-                        });
-                    });
-                });
-                
-                // Sort chapters
-                allChapters.sort((a, b) => {
-                    if (sortType === 'alternate_link') {
-                        if (a.hasAlt !== b.hasAlt) return b.hasAlt - a.hasAlt; // Has alt link first
-                    } else if (sortType === 'available') {
-                        if (a.hasAlt !== b.hasAlt) return a.hasAlt - b.hasAlt; // No alt link first
-                    }
-                    
-                    // Secondary sort by chapter number
-                    return a.chapterNumber - b.chapterNumber;
-                });
-                
-                // Clear container
-                container.innerHTML = '';
-                
-                // Re-group by volume if needed
-                if (sortType === 'chapter') {
-                    // Keep volume structure
-                    volumeSections.forEach(section => container.appendChild(section));
-                } else {
-                    // Create flat list without volume headers for alternate_link and available sorts
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'space-y-1';
-                    allChapters.forEach(item => {
-                        wrapper.appendChild(item.element);
-                    });
-                    container.appendChild(wrapper);
-                }
-                
-                return; // Exit early for non-volume sorts
-            }
-            
-            // Re-append volume sections for volume sort
-            container.innerHTML = '';
-            volumeSections.forEach(section => container.appendChild(section));
-        }
-
-        // Jalankan sorting default saat halaman dimuat
-        const defaultActivePanel = document.querySelector('.chapter-panel:not(.hidden)');
-        if (defaultActivePanel) {
-            const listContainer = defaultActivePanel.querySelector('.chapter-list-container');
-            if (listContainer) {
-                applySorting(listContainer, 'chapter');
+    // Hide menu when clicking outside
+    document.addEventListener("click", function (e) {
+        if (sortMenuButton && sortMenu) {
+            if (
+                !sortMenuButton.contains(e.target) &&
+                !sortMenu.contains(e.target)
+            ) {
+                sortMenu.classList.add("hidden");
             }
         }
     });
+
+
+    // --- 3. Chapter Dropdown Logic (Fungsi untuk inisialisasi) ---
+    function initializeDropdowns() {
+        // Ambil semua tombol dropdown yang ada di DOM saat ini
+        const dropdownButtons = document.querySelectorAll(
+            ".chapter-dropdown > button"
+        );
+
+        dropdownButtons.forEach((button) => {
+            // Hapus listener yang mungkin sudah ada sebelumnya untuk mencegah double-click
+            // (Cara yang lebih canggih mungkin diperlukan tergantung cara browser menangani listener)
+            // Untuk skenario ini, kita hanya menambahkan listener.
+
+            // Kita harus pastikan listener hanya ditambahkan sekali
+            if (button.dataset.listenerAttached !== "true") {
+                button.addEventListener("click", function () {
+                    const dropdown = this.closest(".chapter-dropdown");
+                    const content = dropdown.querySelector(".dropdown-content");
+                    const arrow = dropdown.querySelector(".dropdown-arrow");
+
+                    // Toggle visibility
+                    if (content) {
+                        content.classList.toggle("hidden");
+                    }
+
+                    // Toggle arrow rotation
+                    if (arrow && content) {
+                        arrow.classList.toggle(
+                            "rotate-180",
+                            !content.classList.contains("hidden")
+                        );
+                    }
+                });
+                button.dataset.listenerAttached = "true";
+            }
+        });
+    }
+
+    // Inisialisasi dropdown saat halaman pertama kali dimuat
+    initializeDropdowns();
+});
