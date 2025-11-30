@@ -26,7 +26,6 @@ class ComicController extends Controller
             'ar' => 'Arabic',
             'ja' => 'Japanese',
             'zh' => 'Chinese',
-            'zh-hk' => 'Chinese (Hong Kong)',
             'ko' => 'Korean',
             'nl' => 'Dutch',
             'ms' => 'Malay',
@@ -39,6 +38,8 @@ class ComicController extends Controller
             'da' => 'Danish',
             'he' => 'Ibrrai',
             'ka'=> 'Georgian',
+            'es-la' => 'Spanish (Latin America)',
+            'zh-hk' => 'Chinese (Hong Kong)',
             'pt-br' => 'portuguese (Brazil)',
             // tambahkan jika butuh lagi
         ];
