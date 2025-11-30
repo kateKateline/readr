@@ -37,7 +37,7 @@
                         @endforeach
                         @if (count($staticTags) > $visibleTagsCount)
                         <button id="show-more-tags" class="px-2 py-0.5 text-xs font-medium bg-[#21262d] text-[#8b949e] rounded-full border border-[#30363d] hover:text-white transition-colors">
-                            ...
+                            >
                         </button>
                         @endif
                     </div>
