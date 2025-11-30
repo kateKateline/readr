@@ -1,4 +1,4 @@
-<header class="bg-[#0d1117]/95 backdrop-blur-sm border-b border-[#21262d] sticky top-0 z-50">
+<header class="bg-[#0d1117]/95 backdrop-blur-sm border-b border-[#21262d] sticky top-0 z-50 transition-transform duration-300 ease-in-out">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <!-- Logo -->
         <a href="/" class="text-xl font-semibold text-white hover:text-gray-300 transition">
