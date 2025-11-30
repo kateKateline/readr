@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardComicController;
+use App\Http\Controllers\DashboardUserController;
+use App\Http\Controllers\DashboardChapterController;
+use App\Http\Controllers\DashboardCommentController;
+use App\Http\Controllers\DashboardGlobalChatController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ComicController;
@@ -58,10 +62,27 @@ Route::middleware('auth')->group(function () {
     Route::middleware('isAdmin')->group(function () {
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::post('/dashboard/reset-global-chat', [DashboardController::class, 'resetGlobalChat'])->name('dashboard.reset-global-chat');
 
-        // Dashboard CRUD Comics/Manga
+        // Dashboard CRUD
+        Route::resource('/dashboard/users', DashboardUserController::class)
+            ->names('dashboard.users')
+            ->except(['show']);
+
         Route::resource('/dashboard/comics', DashboardComicController::class)
             ->names('dashboard.comics')
+            ->except(['show']);
+
+        Route::resource('/dashboard/chapters', DashboardChapterController::class)
+            ->names('dashboard.chapters')
+            ->except(['show']);
+
+        Route::resource('/dashboard/comments', DashboardCommentController::class)
+            ->names('dashboard.comments')
+            ->except(['show']);
+
+        Route::resource('/dashboard/global-chats', DashboardGlobalChatController::class)
+            ->names('dashboard.global-chats')
             ->except(['show']);
 
     });
