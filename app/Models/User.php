@@ -25,4 +25,10 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    // Relasi dengan Comments
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

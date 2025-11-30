@@ -62,12 +62,20 @@ class ComicController extends Controller
             $languageLabels[$lang] = $languageNames[$lang] ?? strtoupper($lang);
         }
 
+        // Load comments dengan relasi user dan nested replies
+        $comments = $comic->comments()
+            ->parentOnly()
+            ->with(['user', 'replies.user'])
+            ->latest()
+            ->get();
+
         return view('comics.show', compact(
             'comic',
             'chaptersByLanguage',
             'availableLanguages',
             'defaultLanguage',
-            'languageLabels'
+            'languageLabels',
+            'comments'  // Tambahkan ini
         ));
     }
 }

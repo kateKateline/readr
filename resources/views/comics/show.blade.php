@@ -78,22 +78,22 @@
 
         {{-- Language Tabs (Sort By Dihapus) --}}
         <div class="flex justify-start border-b border-b-[#30363d] px-6 pt-4 pb-0 overflow-x-auto whitespace-nowrap">
-<nav class="flex space-x-2 flex-shrink-0" role="tablist">
-    @foreach ($availableLanguages as $lang)
-        <button
-            id="tab-{{ $lang }}"
-            data-lang="{{ $lang }}"
-            class="tab-btn py-2 px-4 text-sm font-medium border-b-2
+            <nav class="flex space-x-2 flex-shrink-0" role="tablist">
+                @foreach ($availableLanguages as $lang)
+                <button
+                    id="tab-{{ $lang }}"
+                    data-lang="{{ $lang }}"
+                    class="tab-btn py-2 px-4 text-sm font-medium border-b-2
                     {{ $lang === $defaultLanguage ? 'border-blue-500 text-white' : 'border-transparent text-[#8b949e] hover:text-white hover:border-[#8b949e]' }}
                     focus:outline-none transition-colors duration-150"
-            role="tab"
-            aria-controls="panel-{{ $lang }}"
-            aria-selected="{{ $lang === $defaultLanguage ? 'true' : 'false' }}">
-            {{ $languageLabels[$lang] }} ({{ $chaptersByLanguage[$lang]->count() }})
-        </button>
-    @endforeach
-</nav>
-        
+                    role="tab"
+                    aria-controls="panel-{{ $lang }}"
+                    aria-selected="{{ $lang === $defaultLanguage ? 'true' : 'false' }}">
+                    {{ $languageLabels[$lang] }} ({{ $chaptersByLanguage[$lang]->count() }})
+                </button>
+                @endforeach
+            </nav>
+
             {{-- Bagian Sort By Dihapus --}}
         </div>
 
@@ -221,4 +221,6 @@
         </div>
     </div>
 </div>
+
+@include('partials.chat.comment', ['comic' => $comic, 'comments' => $comments])
 @endsection
