@@ -58,7 +58,7 @@
                         required
                         class="w-full px-4 py-3 bg-[#0d1117] border border-[#30363d] text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical min-h-[100px] transition-all duration-200"></textarea>
                     @error('comment')
-                    <span class="text-red-400 text-sm mt-2 block flex items-center">
+                    <span class="text-red-400 text-sm mt-2 flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                         </svg>
@@ -94,7 +94,7 @@
 
     {{-- List comments --}}
     @if($comments->count() > 0)
-    <div id="comments-container">
+    <div id="comments-container" data-total-comments="{{ intval($comments->count() ?? 0) }}">
         <ul class="space-y-5" id="comments-list">
             @foreach($comments as $index => $comment)
             <div class="comment-wrapper {{ $index >= 2 ? 'hidden' : '' }}" data-comment-index="{{ $index }}">
@@ -129,12 +129,15 @@
         <p class="text-gray-600 text-sm mt-2">Be the first to share your thoughts!</p>
     </div>
     @endif
-</div>
 
-<script>
-    
+    <script>
         let commentsExpanded = false;
-        const totalComments = {{ $comments->count() }};
+
+        // --- Bagian yang Diperbarui ---
+        // Ambil elemen kontainer untuk mendapatkan nilai total komentar
+        const totalCommentsElement = document.getElementById('comments-container');
+        const totalComments = parseInt(totalCommentsElement.getAttribute('data-total-comments'));
+        // --- Akhir Bagian yang Diperbarui ---
 
         function toggleComments() {
             const hiddenComments = document.querySelectorAll('.comment-wrapper[data-comment-index]');
@@ -165,13 +168,17 @@
                         }, 300);
                     }
                 });
+                // Gunakan `totalComments` yang sudah didapat
                 btnText.textContent = `Show ${totalComments - 2} More Comments`;
                 btn.querySelector('svg:first-child').style.transform = 'rotate(0deg)';
                 btn.querySelector('svg:last-child').style.transform = 'rotate(0deg)';
                 commentsExpanded = false;
-                
+
                 setTimeout(() => {
-                    document.getElementById('comments-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    document.getElementById('comments-container').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }, 100);
             }
         }
@@ -180,11 +187,10 @@
             const repliesList = document.getElementById('replies-list-' + commentId);
             const repliesIcon = document.getElementById('replies-icon-' + commentId);
             const repliesText = document.getElementById('replies-text-' + commentId);
-            const toggleBtn = document.getElementById('replies-toggle-' + commentId);
-            
+
             const isHidden = repliesList.classList.contains('hidden');
             const replyCount = repliesList.querySelectorAll(':scope > .comment-wrapper, :scope > li').length;
-            
+
             if (isHidden) {
                 repliesList.classList.remove('hidden');
                 repliesList.style.animation = 'slideDown 0.3s ease-out forwards';
@@ -234,29 +240,30 @@
         // Add animation styles
         const style = document.createElement('style');
         style.textContent = `
-            @keyframes slideDown {
-                from {
-                    opacity: 0;
-                    transform: translateY(-10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
             }
-            @keyframes slideUp {
-                from {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-                to {
-                    opacity: 0;
-                    transform: translateY(-10px);
-                }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
-            #show-more-btn svg {
-                transition: transform 0.3s ease;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
             }
-        `;
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+        #show-more-btn svg {
+            transition: transform 0.3s ease;
+        }
+    `;
         document.head.appendChild(style);
-</script>
+    </script>
+</div>
