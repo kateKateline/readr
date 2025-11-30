@@ -30,3 +30,6 @@ for the past week i mmanage to make a show chapter feature, need some ui update 
 
 11/29/1025 -h
 ui element show is done 
+
+11/30/29 -h 
+dashboard and comment feature the dashboard is almost done
