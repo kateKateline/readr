@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\GlobalChat;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class DashboardGlobalChatController extends Controller
 {
@@ -52,6 +53,22 @@ class DashboardGlobalChatController extends Controller
     {
         $globalChat->delete();
         return redirect()->route('dashboard.global-chats.index')->with('success', 'Global chat berhasil dihapus!');
+    }
+
+    public function print()
+    {
+        $chats = GlobalChat::with('user')->latest()->get();
+        return response()->json([
+            'title' => 'Global Chats',
+            'headers' => ['User', 'Message', 'Created'],
+            'data' => $chats->map(function($chat) {
+                return [
+                    $chat->user->name ?? 'Unknown',
+                    Str::limit($chat->message, 60),
+                    $chat->created_at->format('M d, Y H:i')
+                ];
+            })
+        ]);
     }
 }
 

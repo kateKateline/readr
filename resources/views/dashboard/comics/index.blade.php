@@ -6,25 +6,32 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <h2 class="text-2xl font-bold text-white">Comics</h2>
-        <a href="{{ route('dashboard.comics.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Add Comic
-        </a>
+        <div class="flex items-center gap-3">
+            @include('partials.print-button')
+            <a href="{{ route('dashboard.comics.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Comic
+            </a>
+        </div>
     </div>
 
-    <div class="bg-[#161b22] border border-[#21262d] rounded-lg overflow-hidden">
+    <div class="bg-[#161b22] border border-[#21262d] rounded-lg overflow-hidden print-table-container">
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full print-table" id="comicsTable">
                 <thead class="bg-[#0d1117]">
                     <tr>
                         <th class="text-left py-3 px-6 text-gray-400 text-sm font-medium">Title</th>
                         <th class="text-left py-3 px-6 text-gray-400 text-sm font-medium">Author</th>
                         <th class="text-left py-3 px-6 text-gray-400 text-sm font-medium">Status</th>
                         <th class="text-left py-3 px-6 text-gray-400 text-sm font-medium">Rating</th>
-                        <th class="text-right py-3 px-6 text-gray-400 text-sm font-medium">Actions</th>
+                        <th class="text-right py-3 px-6 text-gray-400 text-sm font-medium no-print">Actions</th>
                     </tr>
+                    @include('partials.table-search', [
+                        'searchColumns' => ['Title', 'Author', 'Status', 'Rating'],
+                        'hasActions' => true
+                    ])
                 </thead>
                 <tbody>
                     @forelse($comics as $comic)
@@ -39,7 +46,7 @@
                                 @endif
                             </td>
                             <td class="py-4 px-6 text-gray-400">{{ $comic->rating ?? 'N/A' }}</td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-6 no-print">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('dashboard.comics.edit', $comic) }}" class="text-blue-500 hover:text-blue-400">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +73,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="p-4 border-t border-[#21262d]">
+        <div class="p-4 border-t border-[#21262d] no-print">
             {{ $comics->links() }}
         </div>
     </div>

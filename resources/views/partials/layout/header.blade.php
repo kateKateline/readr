@@ -13,6 +13,65 @@
             <a href="#" class="text-white">Contact</a>
         </nav>
 
+        <!-- Search Bar -->
+        <div class="flex-1 max-w-md mx-4 hidden lg:block">
+            <form action="{{ route('comics.search') }}" method="GET" class="relative">
+                <input 
+                    type="text" 
+                    name="q" 
+                    value="{{ request('q') }}"
+                    placeholder="Search comics..." 
+                    class="w-full bg-[#161b22] border border-[#21262d] rounded-md px-4 py-2 pl-10 text-sm text-gray-300 placeholder-gray-500 focus:outline-none focus:border-[#30363d] focus:ring-1 focus:ring-[#30363d] transition"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                     class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" 
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </form>
+        </div>
+
+        <!-- Mobile Search -->
+        <div x-data="{ searchOpen: false }" class="lg:hidden relative">
+            <button @click="searchOpen = !searchOpen" 
+                    class="p-2 text-gray-400 hover:text-gray-200 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                     class="h-5 w-5" 
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </button>
+            
+            <div x-show="searchOpen" 
+                 x-cloak
+                 @click.away="searchOpen = false"
+                 x-transition:enter="transition ease-out duration-100"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-75"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="absolute top-full left-0 right-0 bg-[#0d1117] border-b border-[#21262d] p-4 z-50 mt-2">
+                <form action="{{ route('comics.search') }}" method="GET" class="relative">
+                    <input 
+                        type="text" 
+                        name="q" 
+                        value="{{ request('q') }}"
+                        placeholder="Search comics..." 
+                        class="w-full bg-[#161b22] border border-[#21262d] rounded-md px-4 py-2 pl-10 text-sm text-gray-300 placeholder-gray-500 focus:outline-none focus:border-[#30363d] focus:ring-1 focus:ring-[#30363d] transition"
+                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" 
+                         class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" 
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </form>
+            </div>
+        </div>
+
         <!-- Right Section -->
         <div class="relative flex items-center gap-3">
             @auth

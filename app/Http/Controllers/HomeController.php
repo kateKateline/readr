@@ -36,4 +36,42 @@ class HomeController extends Controller
 
         return view('home', compact('comics', 'chats', 'topRanks'));
     }
+
+    public function search(ComicService $comicService)
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        $query = request()->get('q', '');
+        
+        // Base query
+        $comicQuery = Comic::query();
+
+        // Apply censorship filter
+        if (!$user || ($user && $user->censorship_enabled)) {
+            $comicQuery->where('is_sensitive', false);
+        }
+
+        // Search by title or author if query is provided
+        if (!empty($query)) {
+            $comicQuery->where(function($q) use ($query) {
+                $q->where('title', 'LIKE', '%' . $query . '%')
+                  ->orWhere('author', 'LIKE', '%' . $query . '%');
+            });
+        }
+
+        // Order by last update
+        $comics = $comicQuery->orderByDesc('last_update')->paginate(15)->withQueryString();
+
+        // Get global chat
+        $chats = GlobalChat::with('user')
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+
+        // Get top ranks
+        $censorshipEnabled = !$user || ($user && $user->censorship_enabled);
+        $topRanks = $comicService->getTopRankedComics(10, $censorshipEnabled);
+
+        return view('home', compact('comics', 'chats', 'topRanks', 'query'));
+    }
 }

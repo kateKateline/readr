@@ -73,5 +73,22 @@ class DashboardChapterController extends Controller
         $chapter->delete();
         return redirect()->route('dashboard.chapters.index')->with('success', 'Chapter berhasil dihapus!');
     }
+
+    public function print()
+    {
+        $chapters = Chapter::with('comic')->latest()->get();
+        return response()->json([
+            'title' => 'Chapters',
+            'headers' => ['Chapter', 'Title', 'Comic', 'Language'],
+            'data' => $chapters->map(function($chapter) {
+                return [
+                    'Ch. ' . $chapter->chapter_number,
+                    $chapter->title ?? 'Untitled',
+                    $chapter->comic->title ?? 'Unknown',
+                    $chapter->translated_language ?? 'N/A'
+                ];
+            })
+        ]);
+    }
 }
 

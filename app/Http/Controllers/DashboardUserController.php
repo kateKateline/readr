@@ -69,5 +69,22 @@ class DashboardUserController extends Controller
         $user->delete();
         return redirect()->route('dashboard.users.index')->with('success', 'User berhasil dihapus!');
     }
+
+    public function print()
+    {
+        $users = User::latest()->get();
+        return response()->json([
+            'title' => 'Users',
+            'headers' => ['Name', 'Email', 'Level', 'Created'],
+            'data' => $users->map(function($user) {
+                return [
+                    $user->name,
+                    $user->email,
+                    ucfirst($user->level),
+                    $user->created_at->format('M d, Y')
+                ];
+            })
+        ]);
+    }
 }
 

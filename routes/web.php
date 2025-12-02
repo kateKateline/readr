@@ -28,6 +28,7 @@ Route::post('/global-chat', [GlobalChatController::class, 'store'])
 // PUBLIC ROUTES
 // =============================================
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/search', [HomeController::class, 'search'])->name('comics.search');
 
 Route::get('/comic/{comic:mangadex_id}', [ComicController::class, 'show'])
     ->name('comic.show');
@@ -84,6 +85,13 @@ Route::middleware('auth')->group(function () {
         Route::resource('/dashboard/global-chats', DashboardGlobalChatController::class)
             ->names('dashboard.global-chats')
             ->except(['show']);
+
+        // Print routes
+        Route::get('/dashboard/users/print', [DashboardUserController::class, 'print'])->name('dashboard.users.print');
+        Route::get('/dashboard/comics/print', [DashboardComicController::class, 'print'])->name('dashboard.comics.print');
+        Route::get('/dashboard/chapters/print', [DashboardChapterController::class, 'print'])->name('dashboard.chapters.print');
+        Route::get('/dashboard/comments/print', [DashboardCommentController::class, 'print'])->name('dashboard.comments.print');
+        Route::get('/dashboard/global-chats/print', [DashboardGlobalChatController::class, 'print'])->name('dashboard.global-chats.print');
 
     });
 

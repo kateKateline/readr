@@ -6,25 +6,32 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <h2 class="text-2xl font-bold text-white">Users</h2>
-        <a href="{{ route('dashboard.users.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Add User
-        </a>
+        <div class="flex items-center gap-3">
+            @include('partials.print-button')
+            <a href="{{ route('dashboard.users.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add User
+            </a>
+        </div>
     </div>
 
-    <div class="bg-[#161b22] border border-[#21262d] rounded-lg overflow-hidden">
+    <div class="bg-[#161b22] border border-[#21262d] rounded-lg overflow-hidden print-table-container">
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full print-table" id="usersTable">
                 <thead class="bg-[#0d1117]">
                     <tr>
                         <th class="text-left py-3 px-6 text-gray-400 text-sm font-medium">Name</th>
                         <th class="text-left py-3 px-6 text-gray-400 text-sm font-medium">Email</th>
                         <th class="text-left py-3 px-6 text-gray-400 text-sm font-medium">Level</th>
                         <th class="text-left py-3 px-6 text-gray-400 text-sm font-medium">Created</th>
-                        <th class="text-right py-3 px-6 text-gray-400 text-sm font-medium">Actions</th>
+                        <th class="text-right py-3 px-6 text-gray-400 text-sm font-medium no-print">Actions</th>
                     </tr>
+                    @include('partials.table-search', [
+                        'searchColumns' => ['Name', 'Email', 'Level', 'Created'],
+                        'hasActions' => true
+                    ])
                 </thead>
                 <tbody>
                     @forelse($users as $user)
@@ -37,7 +44,7 @@
                                 </span>
                             </td>
                             <td class="py-4 px-6 text-gray-400 text-sm">{{ $user->created_at->format('M d, Y') }}</td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-6 no-print">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('dashboard.users.edit', $user) }}" class="text-blue-500 hover:text-blue-400">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,7 +71,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="p-4 border-t border-[#21262d]">
+        <div class="p-4 border-t border-[#21262d] no-print">
             {{ $users->links() }}
         </div>
     </div>

@@ -6,25 +6,32 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <h2 class="text-2xl font-bold text-white">Chapters</h2>
-        <a href="{{ route('dashboard.chapters.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
+        <div class="flex items-center gap-3">
+            @include('partials.print-button')
+            <a href="{{ route('dashboard.chapters.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
             Add Chapter
-        </a>
+            </a>
+        </div>
     </div>
 
-    <div class="bg-[#161b22] border border-[#21262d] rounded-lg overflow-hidden">
+    <div class="bg-[#161b22] border border-[#21262d] rounded-lg overflow-hidden print-table-container">
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full print-table" id="chaptersTable">
                 <thead class="bg-[#0d1117]">
                     <tr>
                         <th class="text-left py-3 px-6 text-gray-400 text-sm font-medium">Chapter</th>
                         <th class="text-left py-3 px-6 text-gray-400 text-sm font-medium">Title</th>
                         <th class="text-left py-3 px-6 text-gray-400 text-sm font-medium">Comic</th>
                         <th class="text-left py-3 px-6 text-gray-400 text-sm font-medium">Language</th>
-                        <th class="text-right py-3 px-6 text-gray-400 text-sm font-medium">Actions</th>
+                        <th class="text-right py-3 px-6 text-gray-400 text-sm font-medium no-print">Actions</th>
                     </tr>
+                    @include('partials.table-search', [
+                        'searchColumns' => ['Chapter', 'Title', 'Comic', 'Language'],
+                        'hasActions' => true
+                    ])
                 </thead>
                 <tbody>
                     @forelse($chapters as $chapter)
@@ -35,7 +42,7 @@
                             <td class="py-4 px-6">
                                 <span class="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">{{ $chapter->translated_language ?? 'N/A' }}</span>
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-6 no-print">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('dashboard.chapters.edit', $chapter) }}" class="text-blue-500 hover:text-blue-400">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,7 +69,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="p-4 border-t border-[#21262d]">
+        <div class="p-4 border-t border-[#21262d] no-print">
             {{ $chapters->links() }}
         </div>
     </div>

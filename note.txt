@@ -33,3 +33,6 @@ ui element show is done
 
 11/30/29 -h 
 dashboard and comment feature the dashboard is almost done
+
+
+tambah ctrl p

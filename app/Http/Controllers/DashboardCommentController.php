@@ -6,6 +6,7 @@ use App\Models\Comment;
 use App\Models\Comic;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class DashboardCommentController extends Controller
 {
@@ -63,6 +64,23 @@ class DashboardCommentController extends Controller
     {
         $comment->delete();
         return redirect()->route('dashboard.comments.index')->with('success', 'Comment berhasil dihapus!');
+    }
+
+    public function print()
+    {
+        $comments = Comment::with(['user', 'comic'])->latest()->get();
+        return response()->json([
+            'title' => 'Comments',
+            'headers' => ['User', 'Comment', 'Comic', 'Type'],
+            'data' => $comments->map(function($comment) {
+                return [
+                    $comment->user->name ?? 'Unknown',
+                    Str::limit($comment->comment, 50),
+                    $comment->comic->title ?? 'Unknown',
+                    $comment->parent_id ? 'Reply' : 'Comment'
+                ];
+            })
+        ]);
     }
 }
 

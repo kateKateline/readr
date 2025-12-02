@@ -38,6 +38,7 @@ class ComicController extends Controller
             'da' => 'Danish',
             'he' => 'Ibrrai',
             'ka'=> 'Georgian',
+            'ca'=> 'Catalan',
             'es-la' => 'Spanish (Latin America)',
             'zh-hk' => 'Chinese (Hong Kong)',
             'pt-br' => 'portuguese (Brazil)',

@@ -64,5 +64,22 @@ class DashboardComicController extends Controller
         $comic->delete();
         return redirect()->route('dashboard.comics.index')->with('success', 'Comic berhasil dihapus!');
     }
+
+    public function print()
+    {
+        $comics = Comic::latest()->get();
+        return response()->json([
+            'title' => 'Comics',
+            'headers' => ['Title', 'Author', 'Status', 'Rating'],
+            'data' => $comics->map(function($comic) {
+                return [
+                    $comic->title,
+                    $comic->author ?? 'Unknown',
+                    $comic->status ?? '-',
+                    $comic->rating ?? 'N/A'
+                ];
+            })
+        ]);
+    }
 }
 
