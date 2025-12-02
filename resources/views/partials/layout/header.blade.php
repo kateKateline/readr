@@ -8,7 +8,7 @@
         <!-- Navigation -->
         <nav class="space-x-6 hidden md:block text-base">
             <a href="/" class="text-white">Home</a>
-            <a href="#" class="text-white">Explore</a>
+            <a href="/search" class="text-white">Explore</a>
             <a href="#" class="text-white">About</a>
             <a href="#" class="text-white">Contact</a>
         </nav>

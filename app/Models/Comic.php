@@ -16,6 +16,7 @@ class Comic extends Model
         'title',
         'author',
         'type',
+        'genre',
         'image',
         'status',
         'is_sensitive',

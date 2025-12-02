@@ -3,7 +3,10 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-6 py-12 text-[#c9d1d9]">
 
-    <div class="flex gap-6">
+    {{-- Recommended / Recently Popular Comics - Full Width --}}
+    @include('partials.cards.recomend')
+
+    <div class="flex gap-6 mt-6">
 
         <!-- LEFT: Comic Cards -->
         <div class="flex-1">

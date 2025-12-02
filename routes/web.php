@@ -28,7 +28,7 @@ Route::post('/global-chat', [GlobalChatController::class, 'store'])
 // PUBLIC ROUTES
 // =============================================
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/search', [HomeController::class, 'search'])->name('comics.search');
+Route::get('/search', [\App\Http\Controllers\ExploreController::class, 'search'])->name('comics.search');
 
 Route::get('/comic/{comic:mangadex_id}', [ComicController::class, 'show'])
     ->name('comic.show');

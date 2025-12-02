@@ -25,6 +25,16 @@ class HomeController extends Controller
         // Gunakan paginate agar mudah menavigasi banyak data
         $comics = $query->paginate(15)->withQueryString();
 
+        // Komik rekomendasi (random) dari tabel comics dengan filter censorship yang sama
+        $recommendedQuery = Comic::query();
+        if (!$user || ($user && $user->censorship_enabled)) {
+            $recommendedQuery->where('is_sensitive', false);
+        }
+        $recommendedComics = $recommendedQuery
+            ->inRandomOrder()
+            ->limit(10)
+            ->get();
+
         // Ambil semua global chat dengan relasi user
         $chats = GlobalChat::with('user')
                     ->orderBy('created_at', 'asc')
@@ -34,7 +44,7 @@ class HomeController extends Controller
         $censorshipEnabled = !$user || ($user && $user->censorship_enabled);
         $topRanks = $comicService->getTopRankedComics(10, $censorshipEnabled);
 
-        return view('home', compact('comics', 'chats', 'topRanks'));
+        return view('home', compact('comics', 'chats', 'topRanks', 'recommendedComics'));
     }
 
     public function search(ComicService $comicService)
@@ -63,6 +73,16 @@ class HomeController extends Controller
         // Order by last update
         $comics = $comicQuery->orderByDesc('last_update')->paginate(15)->withQueryString();
 
+        // Komik rekomendasi (random) dari tabel comics dengan filter censorship yang sama
+        $recommendedQuery = Comic::query();
+        if (!$user || ($user && $user->censorship_enabled)) {
+            $recommendedQuery->where('is_sensitive', false);
+        }
+        $recommendedComics = $recommendedQuery
+            ->inRandomOrder()
+            ->limit(10)
+            ->get();
+
         // Get global chat
         $chats = GlobalChat::with('user')
                     ->orderBy('created_at', 'asc')
@@ -72,6 +92,6 @@ class HomeController extends Controller
         $censorshipEnabled = !$user || ($user && $user->censorship_enabled);
         $topRanks = $comicService->getTopRankedComics(10, $censorshipEnabled);
 
-        return view('home', compact('comics', 'chats', 'topRanks', 'query'));
+        return view('home', compact('comics', 'chats', 'topRanks', 'query', 'recommendedComics'));
     }
 }

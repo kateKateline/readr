@@ -24,23 +24,27 @@
                         <span class="font-medium">Author:</span> {{ $comic->author ?? 'Unknown' }}
                     </p>
 
-                    {{-- Tags Section --}}
+                    {{-- Genres Section (from database) --}}
                     @php
-                    $staticTags = ['Action', 'Fantasy', 'System', 'Dungeon', 'Level Up', 'Reincarnation', 'Magic', 'Adventure', 'Isekai'];
-                    $visibleTagsCount = 3;
+                    $genres = !empty($comic->genre) 
+                        ? array_map('trim', explode(',', $comic->genre))
+                        : [];
+                    $visibleGenresCount = 3;
                     @endphp
+                    @if(!empty($genres))
                     <div id="tag-container" class="flex flex-wrap gap-1 mb-4">
-                        @foreach ($staticTags as $index => $tag)
-                        <span class="tag-item inline-block px-2 py-0.5 text-xs font-medium bg-[#21262d] text-[#58a6ff] rounded-full border border-[#30363d] {{ $index >= $visibleTagsCount ? 'hidden' : '' }}" data-tag-index="{{ $index }}">
-                            {{ $tag }}
+                        @foreach ($genres as $index => $genre)
+                        <span class="tag-item inline-block px-2 py-0.5 text-xs font-medium bg-[#21262d] text-[#58a6ff] rounded-full border border-[#30363d] {{ $index >= $visibleGenresCount ? 'hidden' : '' }}" data-tag-index="{{ $index }}">
+                            {{ $genre }}
                         </span>
                         @endforeach
-                        @if (count($staticTags) > $visibleTagsCount)
+                        @if (count($genres) > $visibleGenresCount)
                         <button id="show-more-tags" class="px-2 py-0.5 text-xs font-medium bg-[#21262d] text-[#8b949e] rounded-full border border-[#30363d] hover:text-white transition-colors">
                             >
                         </button>
                         @endif
                     </div>
+                    @endif
                 </div>
 
                 {{-- Rating --}}

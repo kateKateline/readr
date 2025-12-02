@@ -191,158 +191,117 @@
 
 @push('scripts')
 <script>
-    // Statistics Data
+    // Stats data dari backend - gunakan json_encode untuk clean parsing
     const statsData = {
-        users: {{ $stats['total_users'] }},
-        comics: {{ $stats['total_comics'] }},
-        chapters: {{ $stats['total_chapters'] }},
-        comments: {{ $stats['total_comments'] }},
-        globalChats: {{ $stats['total_global_chats'] }}
+        users: {{ $stats['total_users'] ?? 0 }},
+        comics: {{ $stats['total_comics'] ?? 0 }},
+        chapters: {{ $stats['total_chapters'] ?? 0 }},
+        comments: {{ $stats['total_comments'] ?? 0 }},
+        globalChats: {{ $stats['total_global_chats'] ?? 0 }}
     };
 
-    // Bar Chart - Statistics Overview
-    const statisticsCtx = document.getElementById('statisticsChart');
-    if (statisticsCtx) {
-        new Chart(statisticsCtx, {
+    // Chart config
+    const chartColors = {
+        blue: { bg: 'rgba(59, 130, 246, 0.8)', border: 'rgba(59, 130, 246, 1)' },
+        green: { bg: 'rgba(34, 197, 94, 0.8)', border: 'rgba(34, 197, 94, 1)' },
+        purple: { bg: 'rgba(168, 85, 247, 0.8)', border: 'rgba(168, 85, 247, 1)' },
+        yellow: { bg: 'rgba(234, 179, 8, 0.8)', border: 'rgba(234, 179, 8, 1)' },
+        red: { bg: 'rgba(239, 68, 68, 0.8)', border: 'rgba(239, 68, 68, 1)' }
+    };
+
+    const labels = ['Users', 'Comics', 'Chapters', 'Comments', 'Global Chats'];
+    const dataValues = [
+        statsData.users,
+        statsData.comics,
+        statsData.chapters,
+        statsData.comments,
+        statsData.globalChats
+    ];
+    const bgColors = Object.values(chartColors).map(c => c.bg);
+    const borderColors = Object.values(chartColors).map(c => c.border);
+
+    // Common chart options
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            tooltip: {
+                backgroundColor: 'rgba(22, 27, 34, 0.95)',
+                titleColor: '#c9d1d9',
+                bodyColor: '#c9d1d9',
+                borderColor: '#21262d',
+                borderWidth: 1,
+                padding: 12
+            }
+        }
+    };
+
+    // Bar Chart
+    const statsCtx = document.getElementById('statisticsChart');
+    if (statsCtx) {
+        new Chart(statsCtx, {
             type: 'bar',
             data: {
-                labels: ['Users', 'Comics', 'Chapters', 'Comments', 'Global Chats'],
+                labels,
                 datasets: [{
                     label: 'Total Count',
-                    data: [
-                        statsData.users,
-                        statsData.comics,
-                        statsData.chapters,
-                        statsData.comments,
-                        statsData.globalChats
-                    ],
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.8)',
-                        'rgba(34, 197, 94, 0.8)',
-                        'rgba(168, 85, 247, 0.8)',
-                        'rgba(234, 179, 8, 0.8)',
-                        'rgba(239, 68, 68, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(34, 197, 94, 1)',
-                        'rgba(168, 85, 247, 1)',
-                        'rgba(234, 179, 8, 1)',
-                        'rgba(239, 68, 68, 1)'
-                    ],
+                    data: dataValues,
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
                     borderWidth: 2,
                     borderRadius: 8
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: true,
+                ...commonOptions,
                 plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(22, 27, 34, 0.95)',
-                        titleColor: '#c9d1d9',
-                        bodyColor: '#c9d1d9',
-                        borderColor: '#21262d',
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: true
-                    }
+                    ...commonOptions.plugins,
+                    legend: { display: false }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: {
-                            color: '#8b949e',
-                            font: {
-                                size: 12
-                            }
-                        },
-                        grid: {
-                            color: '#21262d'
-                        }
+                        ticks: { color: '#8b949e', font: { size: 12 } },
+                        grid: { color: '#21262d' }
                     },
                     x: {
-                        ticks: {
-                            color: '#8b949e',
-                            font: {
-                                size: 12
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
+                        ticks: { color: '#8b949e', font: { size: 12 } },
+                        grid: { display: false }
                     }
                 }
             }
         });
     }
 
-    // Doughnut Chart - Data Distribution
-    const distributionCtx = document.getElementById('distributionChart');
-    if (distributionCtx) {
-        new Chart(distributionCtx, {
+    // Doughnut Chart
+    const distCtx = document.getElementById('distributionChart');
+    if (distCtx) {
+        new Chart(distCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Users', 'Comics', 'Chapters', 'Comments', 'Global Chats'],
+                labels,
                 datasets: [{
-                    data: [
-                        statsData.users,
-                        statsData.comics,
-                        statsData.chapters,
-                        statsData.comments,
-                        statsData.globalChats
-                    ],
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.8)',
-                        'rgba(34, 197, 94, 0.8)',
-                        'rgba(168, 85, 247, 0.8)',
-                        'rgba(234, 179, 8, 0.8)',
-                        'rgba(239, 68, 68, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(34, 197, 94, 1)',
-                        'rgba(168, 85, 247, 1)',
-                        'rgba(234, 179, 8, 1)',
-                        'rgba(239, 68, 68, 1)'
-                    ],
+                    data: dataValues,
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
                     borderWidth: 2
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: true,
+                ...commonOptions,
                 plugins: {
+                    ...commonOptions.plugins,
                     legend: {
                         position: 'bottom',
-                        labels: {
-                            color: '#c9d1d9',
-                            padding: 15,
-                            font: {
-                                size: 12
-                            }
-                        }
+                        labels: { color: '#c9d1d9', padding: 15, font: { size: 12 } }
                     },
                     tooltip: {
-                        backgroundColor: 'rgba(22, 27, 34, 0.95)',
-                        titleColor: '#c9d1d9',
-                        bodyColor: '#c9d1d9',
-                        borderColor: '#21262d',
-                        borderWidth: 1,
-                        padding: 12,
+                        ...commonOptions.plugins.tooltip,
                         callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((context.parsed / total) * 100).toFixed(1);
-                                label += context.parsed + ' (' + percentage + '%)';
-                                return label;
+                            label: ctx => {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct = ((ctx.parsed / total) * 100).toFixed(1);
+                                return `${ctx.label}: ${ctx.parsed} (${pct}%)`;
                             }
                         }
                     }

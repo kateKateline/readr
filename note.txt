@@ -31,8 +31,8 @@ for the past week i mmanage to make a show chapter feature, need some ui update 
 11/29/1025 -h
 ui element show is done 
 
-11/30/29 -h 
+11/30/2025 -h 
 dashboard and comment feature the dashboard is almost done
 
-
-tambah ctrl p
+12/3/2025 -h
+dashboard is done just a little more addjustment, explore is done, next=history,bookmarks,profile

@@ -169,6 +169,7 @@ class ComicService
                         'image'        => $image,
                         'status'       => $attr['status'] ?? null,
                         'author'       => $authorName,
+                        'genre'        => $this->extractGenres($item),
                         'is_sensitive' => $this->isSensitive($item),
                         'last_update'  => isset($chapterInfo['updated']) 
                                             ? Carbon::parse($chapterInfo['updated']) 
@@ -395,6 +396,7 @@ class ComicService
                         'image'        => $image, 
                         'status'       => $attr['status'] ?? null, 
                         'author'       => $authorName,
+                        'genre'        => $this->extractGenres($item),
                         'is_sensitive' => $this->isSensitive($item), 
                      
                         'last_update'  => isset($chapterInfo['updated']) 
@@ -600,5 +602,54 @@ class ComicService
         }
 
         return false;
+    }
+    
+    /**
+     * Extract genres from MangaDex manga item
+     * Returns comma-separated genre string
+     * 
+     * @param array $item
+     * @return string|null
+     */
+    private function extractGenres($item)
+    {
+        $tags = collect($item['attributes']['tags'] ?? [])
+            ->map(function($tag) {
+                $name = $tag['attributes']['name']['en'] ?? null;
+                // Filter out sensitive tags, only keep regular genres
+                if ($name && !$this->isSensitiveTag($name)) {
+                    return $name;
+                }
+                return null;
+            })
+            ->filter()
+            ->unique()
+            ->values()
+            ->toArray();
+
+        return !empty($tags) ? implode(', ', $tags) : null;
+    }
+
+    /**
+     * Check if a single tag is sensitive
+     * 
+     * @param string $tag
+     * @return bool
+     */
+    private function isSensitiveTag($tag)
+    {
+        $sensitiveTags = [
+            'ecchi',
+            'adult',
+            'mature',
+            'sexual violence',
+            'gore',
+            'smut',
+            'hentai',
+            'girls love',
+            'boys love'
+        ];
+
+        return in_array(strtolower($tag), array_map('strtolower', $sensitiveTags));
     }
 }
