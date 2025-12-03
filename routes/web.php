@@ -14,6 +14,8 @@ use App\Http\Controllers\ComicController;
 use App\Http\Controllers\GlobalChatController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\HistoryController;
 
 
 Route::middleware(['auth'])->group(function () {
@@ -59,6 +61,18 @@ Route::middleware('auth')->group(function () {
     // Profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 
+    // Bookmarks
+    Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
+    Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
+    Route::delete('/bookmarks/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmarks.destroy');
+
+    // History
+    Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
+    Route::post('/history', [HistoryController::class, 'store'])->name('history.store');
+    Route::put('/history/{history}', [HistoryController::class, 'update'])->name('history.update');
+    Route::delete('/history/{history}', [HistoryController::class, 'destroy'])->name('history.destroy');
+    Route::post('/history/clear-all', [HistoryController::class, 'clearAll'])->name('history.clearAll');
+
     // DASHBOARD ADMIN (ROLE: ADMIN)
     Route::middleware('isAdmin')->group(function () {
 
@@ -73,6 +87,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('/dashboard/comics', DashboardComicController::class)
             ->names('dashboard.comics')
             ->except(['show']);
+        
+        Route::post('/dashboard/comics/{comic}/toggle-sensitive', [DashboardComicController::class, 'toggleSensitive'])
+            ->name('dashboard.comics.toggle-sensitive');
 
         Route::resource('/dashboard/chapters', DashboardChapterController::class)
             ->names('dashboard.chapters')

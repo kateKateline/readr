@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chapter;
+use App\Models\Histories;
+use Illuminate\Support\Facades\Auth;
 
 class ChapterController extends Controller
 {
@@ -55,6 +57,20 @@ public function read(Chapter $chapter)
         ->with(['user', 'replies.user'])
         ->latest()
         ->get();
+
+    // Simpan history jika user sudah login
+    if (Auth::check()) {
+        Histories::updateOrCreate(
+            [
+                'user_id' => Auth::id(),
+                'comic_id' => $comic->id,
+            ],
+            [
+                'last_viewed_chapter' => $chapter->id,
+                'last_viewed_page' => 1, // Default page 1, bisa diupdate via AJAX saat user scroll
+            ]
+        );
+    }
 
     return view('chapters.read', [
         'chapter' => $chapter,

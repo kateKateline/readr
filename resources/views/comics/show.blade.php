@@ -47,14 +47,54 @@
                     @endif
                 </div>
 
-                {{-- Rating --}}
-                <div class="flex-shrink-0 text-center ml-4">
+                {{-- Rating & Bookmark --}}
+                <div class="flex-shrink-0 text-center ml-4 space-y-3">
                     <div class="w-14 h-14 rounded-full bg-green-600 flex items-center justify-center border-2 border-green-400">
                         <span class="text-xl font-bold text-white">
                             {{ number_format($comic->rating ?? 0.0, 1) }}
                         </span>
                     </div>
                     <p class="text-xs text-[#8b949e] mt-1">{{ $comic->rating_count ?? 0 }} Votes</p>
+                    
+                    {{-- Bookmark Button --}}
+                    @auth
+                        @if($isBookmarked && $bookmark)
+                            <form action="{{ route('bookmarks.destroy', $bookmark->id) }}" 
+                                  method="POST" 
+                                  class="mt-3">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" 
+                                        class="w-full px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-400 rounded-md transition flex items-center justify-center gap-2 text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" 
+                                         fill="currentColor" 
+                                         viewBox="0 0 24 24" 
+                                         class="w-4 h-4">
+                                        <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                    </svg>
+                                    Hapus Bookmark
+                                </button>
+                            </form>
+                        @else
+                            <form action="{{ route('bookmarks.store') }}" method="POST" class="mt-3">
+                                @csrf
+                                <input type="hidden" name="comic_id" value="{{ $comic->id }}">
+                                <button type="submit" 
+                                        class="w-full px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-400 rounded-md transition flex items-center justify-center gap-2 text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" 
+                                         fill="none" 
+                                         viewBox="0 0 24 24" 
+                                         stroke-width="2" 
+                                         stroke="currentColor" 
+                                         class="w-4 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" 
+                                              d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                    </svg>
+                                    Tambah Bookmark
+                                </button>
+                            </form>
+                        @endif
+                    @endauth
                 </div>
             </div>
 

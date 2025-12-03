@@ -9,8 +9,9 @@
         <nav class="space-x-6 hidden md:block text-base">
             <a href="/" class="text-white">Home</a>
             <a href="/search" class="text-white">Explore</a>
-            <a href="#" class="text-white">About</a>
-            <a href="#" class="text-white">Contact</a>
+            @auth
+                <a href="{{ route('history.index') }}" class="text-white">History</a>
+            @endauth
         </nav>
 
         <!-- Search Bar -->
@@ -132,7 +133,7 @@
                                 Profile
                             </a>
 
-                            <a href="#" 
+                            <a href="{{ route('bookmarks.index') }}" 
                                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-[#1c2128] transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
                                      stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-500">
@@ -140,6 +141,16 @@
                                           d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
                                 </svg>
                                 Bookmarks
+                            </a>
+
+                            <a href="{{ route('history.index') }}" 
+                               class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-[#1c2128] transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+                                     stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-500">
+                                    <path stroke-linecap="round" stroke-linejoin="round" 
+                                          d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                History
                             </a>
 
                             <div class="border-t border-[#21262d] my-1"></div>

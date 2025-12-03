@@ -7,7 +7,7 @@ use App\Services\ComicService;
 
 class SyncComics extends Command
 {
-    protected $signature = 'sync:comics {limit=50}';
+    protected $signature = 'sync:comics {limit=100}';
     protected $description = 'Sync comics from MangaDex API';
 
     public function handle(ComicService $service)

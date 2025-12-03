@@ -164,29 +164,65 @@
     <!-- Results -->
     <div class="mt-8">
         @if($comics->count() > 0)
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 gap-3">
                 @foreach($comics as $comic)
-                    <a href="{{ route('comic.show', $comic->mangadex_id) }}" class="group">
-                        <div class="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden hover:border-[#58a6ff] transition">
-                            <div class="aspect-[3/4] overflow-hidden">
-                                <img
-                                    src="{{ $comic->image }}"
-                                    alt="{{ $comic->title }}"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    loading="lazy"
-                                />
+                    <a href="{{ route('comic.show', $comic->mangadex_id) }}" 
+                       class="group relative block rounded-lg overflow-hidden bg-[#161b22] border border-[#21262d] hover:border-[#30363d] transition-all duration-300">
+                        
+                        <!-- Cover Image -->
+                        <div class="aspect-[2/3] overflow-hidden bg-[#0d1117] relative">
+
+                            <!-- Flag Badge -->
+                            <div class="absolute top-2 left-2 z-10">
+                                @php
+                                    $flags = [
+                                        'ja' => '🇯🇵', 'jp' => '🇯🇵',
+                                        'zh' => '🇨🇳', 'zh-hk' => '🇨🇳',
+                                        'ko' => '🇰🇷',
+                                        'en' => '🇬🇧',
+                                    ];
+                                    $lang = strtolower($comic->type ?? 'unknown');
+                                    $flag = $flags[$lang] ?? '?';
+                                @endphp
+
+                                <span class="inline-block px-2 py-1 bg-black/60 backdrop-blur-sm rounded-md text-xl">
+                                    {{ $flag }}
+                                </span>
                             </div>
-                            <div class="p-3">
-                                <h3 class="font-medium text-[#c9d1d9] line-clamp-2 group-hover:text-[#58a6ff] transition">
-                                    {{ $comic->title }}
-                                </h3>
-                                <div class="flex items-center gap-2 mt-2 text-xs text-[#8b949e]">
-                                    <span class="px-2 py-0.5 bg-[#21262d] rounded">{{ ucfirst($comic->status) }}</span>
-                                    @if($comic->rating)
-                                        <span>⭐ {{ number_format($comic->rating, 1) }}</span>
-                                    @endif
-                                </div>
-                            </div>
+
+                            <!-- Cover -->
+                            <img 
+                                src="{{ $comic->image }}"
+                                alt="{{ $comic->title }}"
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                loading="lazy"
+                            >
+
+                            <!-- Hover Gradient -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent 
+                                        opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        
+                        <!-- Info -->
+                        <div class="p-3 space-y-2">
+
+                            <!-- Title dengan Truncate -->
+                            <h3 class="font-medium text-sm text-gray-200 group-hover:text-white transition truncate" 
+                                title="{{ $comic->title }}">
+                                {{ Str::limit($comic->title, 40, '...') }}
+                            </h3>
+
+                            <!-- Last Update -->
+                            @if(!empty($comic->last_update) && !empty($comic->last_chapter))
+                                <div class="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-[#21262d]">
+                                    <span class="font-medium">
+                                        Ch. {{ $comic->last_chapter }}
+                                    </span>
+                                    <span>
+                                        {{ formatShortDate($comic->last_update) }}
+                                    </span>
+                                </div>  
+                            @endif  
                         </div>
                     </a>
                 @endforeach
@@ -194,7 +230,7 @@
 
             <!-- Pagination -->
             <div class="mt-8">
-                {{ $comics->links() }}
+                {{ $comics->links('vendor.pagination.custom') }}
             </div>
         @else
             <div class="text-center py-12">

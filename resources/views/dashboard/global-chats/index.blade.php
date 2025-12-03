@@ -66,7 +66,7 @@
             </table>
         </div>
         <div class="p-4 border-t border-[#21262d] no-print">
-            {{ $chats->links() }}
+            {{ $chats->links('vendor.pagination.custom') }}
         </div>
     </div>
 </div>

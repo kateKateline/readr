@@ -31,4 +31,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comment::class);
     }
+
+    // Relasi dengan Bookmarks
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    // Relasi dengan Histories
+    public function histories()
+    {
+        return $this->hasMany(Histories::class);
+    }
 }

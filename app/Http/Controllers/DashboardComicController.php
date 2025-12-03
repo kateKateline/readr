@@ -65,18 +65,35 @@ class DashboardComicController extends Controller
         return redirect()->route('dashboard.comics.index')->with('success', 'Comic berhasil dihapus!');
     }
 
+    public function toggleSensitive(Request $request, Comic $comic)
+    {
+        $request->validate([
+            'is_sensitive' => 'required|boolean',
+        ]);
+
+        $comic->update([
+            'is_sensitive' => $request->is_sensitive
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status sensitive berhasil diupdate'
+        ]);
+    }
+
     public function print()
     {
         $comics = Comic::latest()->get();
         return response()->json([
             'title' => 'Comics',
-            'headers' => ['Title', 'Author', 'Status', 'Rating'],
+            'headers' => ['Title', 'Author', 'Status', 'Type', 'Is Sensitive'],
             'data' => $comics->map(function($comic) {
                 return [
                     $comic->title,
                     $comic->author ?? 'Unknown',
                     $comic->status ?? '-',
-                    $comic->rating ?? 'N/A'
+                    $comic->type ?? '-',
+                    $comic->is_sensitive ? 'Yes' : 'No'
                 ];
             })
         ]);

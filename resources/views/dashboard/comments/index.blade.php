@@ -74,7 +74,7 @@
             </table>
         </div>
         <div class="p-4 border-t border-[#21262d] no-print">
-            {{ $comments->links() }}
+            {{ $comments->links('vendor.pagination.custom') }}
         </div>
     </div>
 </div>

@@ -135,21 +135,40 @@
         
         /* Page break */
         @page {
-            size: A4 landscape;
+            size: A4 portrait;
             margin: 1cm;
         }
         
         /* Ensure table doesn't break across pages */
+        .print-table {
+            table-layout: auto;
+        }
+        
         .print-table thead {
             display: table-header-group;
+        }
+        
+        .print-table thead tr {
+            display: table-row;
+        }
+        
+        .print-table thead th {
+            display: table-cell;
+            vertical-align: middle;
         }
         
         .print-table tbody {
             display: table-row-group;
         }
         
-        .print-table tr {
+        .print-table tbody tr {
+            display: table-row;
             page-break-inside: avoid;
+        }
+        
+        .print-table tbody td {
+            display: table-cell;
+            vertical-align: middle;
         }
     }
 </style>
@@ -221,7 +240,7 @@
                         <title>Print - ${pageTitle}</title>
                         <style>
                     @page {
-                        size: A4 landscape;
+                        size: A4 portrait;
                         margin: 1cm;
                     }
                     
@@ -256,12 +275,18 @@
                         width: 100%;
                         border-collapse: collapse;
                         margin-top: 20px;
+                        table-layout: auto;
                     }
                     
                     thead {
                         background-color: #f3f4f6 !important;
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
+                        display: table-header-group;
+                    }
+                    
+                    thead tr {
+                        display: table-row;
                     }
                     
                     th {
@@ -272,6 +297,8 @@
                         border: 1px solid #000;
                         text-align: left;
                         font-size: 12px;
+                        display: table-cell;
+                        vertical-align: middle;
                     }
                     
                     td {
@@ -281,8 +308,18 @@
                         font-size: 11px;
                     }
                     
+                    tbody {
+                        display: table-row-group;
+                    }
+                    
                     tbody tr {
+                        display: table-row;
                         border-bottom: 1px solid #000;
+                    }
+                    
+                    tbody td {
+                        display: table-cell;
+                        vertical-align: middle;
                     }
                     
                     tbody tr:nth-child(even) {
@@ -328,9 +365,18 @@
                     }
                     
                     @media print {
+                        @page {
+                            size: A4 portrait;
+                            margin: 1cm;
+                        }
+                        
                         body {
                             margin: 0;
                             padding: 0;
+                        }
+                        
+                        table {
+                            page-break-inside: auto;
                         }
                         
                         thead {
@@ -343,6 +389,11 @@
                         
                         tr {
                             page-break-inside: avoid;
+                            page-break-after: auto;
+                        }
+                        
+                        thead tr {
+                            page-break-after: avoid;
                         }
                     }
                 </style>

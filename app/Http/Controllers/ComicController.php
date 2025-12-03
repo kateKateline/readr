@@ -71,13 +71,25 @@ class ComicController extends Controller
             ->latest()
             ->get();
 
+        // Cek apakah comic sudah di-bookmark oleh user yang login
+        $isBookmarked = false;
+        $bookmark = null;
+        if (auth()->check()) {
+            $bookmark = \App\Models\Bookmark::where('user_id', auth()->id())
+                ->where('comic_id', $comic->id)
+                ->first();
+            $isBookmarked = $bookmark !== null;
+        }
+
         return view('comics.show', compact(
             'comic',
             'chaptersByLanguage',
             'availableLanguages',
             'defaultLanguage',
             'languageLabels',
-            'comments'  // Tambahkan ini
+            'comments',
+            'isBookmarked',
+            'bookmark'
         ));
     }
 }
