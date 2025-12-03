@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Comic;
 
 class ExploreController extends Controller
@@ -22,6 +23,12 @@ class ExploreController extends Controller
 		$maxChapters = $request->input('max_chapters');
 
 		$comics = Comic::query();
+
+		// Apply censorship filter based on authenticated user's preference
+		$user = Auth::user();
+		if (!$user || ($user && $user->censorship_enabled)) {
+			$comics->where('is_sensitive', false);
+		}
 
 		// Search by title, author, artist
 		if ($query) {
@@ -77,7 +84,13 @@ class ExploreController extends Controller
 		$comics = $comics->paginate(30)->appends($request->except('page'));
 
 		// All genres for filter UI - extracted dynamically from database
-		$allGenres = Comic::whereNotNull('genre')
+		// Build genre list from comics that the user is allowed to see
+		$genreQuery = Comic::whereNotNull('genre');
+		if (!$user || ($user && $user->censorship_enabled)) {
+			$genreQuery->where('is_sensitive', false);
+		}
+
+		$allGenres = $genreQuery
 			->distinct()
 			->pluck('genre')
 			->flatMap(function($genreString) {
@@ -94,8 +107,10 @@ class ExploreController extends Controller
 			$allGenres = ['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Isekai', 'Romance', 'Sci-Fi', 'Slice of Life', 'Sports', 'Supernatural', 'Thriller', 'Mystery'];
 		}
 
-		// Total comics count for header badge
-		$total = Comic::count();
+		// Total comics count for header badge (respect censorship)
+		$total = Comic::when((!$user || ($user && $user->censorship_enabled)), function($q) {
+			$q->where('is_sensitive', false);
+		})->count();
 
 		return view('explore.search', compact('comics', 'query', 'status', 'type', 'sort', 'includeGenres', 'excludeGenres', 'minChapters', 'maxChapters', 'allGenres', 'total'));
 	}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comic;
+use Illuminate\Pipeline\Hub;
 use Illuminate\Support\Facades\DB;
 
 class ComicController extends Controller
@@ -39,6 +40,16 @@ class ComicController extends Controller
             'he' => 'Ibrrai',
             'ka'=> 'Georgian',
             'ca'=> 'Catalan',
+            'uk' => 'Ukrainian',
+            'mn' => 'Mongolian',
+            'hr' => 'Croatian',
+            'bg' => 'Bulgarian',
+            'sr' => 'Serbian',
+            'kk' => 'Kazakh',
+            'hu' => 'Hungarian',
+            'ro' => 'Romanian',
+            'ur' => 'Urdu',
+            'el' => 'Greek',
             'es-la' => 'Spanish (Latin America)',
             'zh-hk' => 'Chinese (Hong Kong)',
             'pt-br' => 'portuguese (Brazil)',

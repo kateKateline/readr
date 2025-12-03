@@ -4,6 +4,7 @@ npm install
 cp .env.example .env
 php artisan key:generate    
 
+ php artisan sync:chapters e18fe8c6-f6dc-4f05-8462-7b2083ff9a6c  --lang=  
 
 =======sync services========
 php artisan sync:comics

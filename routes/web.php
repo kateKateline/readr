@@ -9,13 +9,14 @@ use App\Http\Controllers\DashboardChapterController;
 use App\Http\Controllers\DashboardCommentController;
 use App\Http\Controllers\DashboardGlobalChatController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ComicController;
 use App\Http\Controllers\GlobalChatController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\ExploreController;
+use App\Http\Controllers\ProfileController;
 
 
 Route::middleware(['auth'])->group(function () {
@@ -63,6 +64,8 @@ Route::middleware('auth')->group(function () {
     
     // Profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'delete'])->name('profile.delete');
 
     // Bookmarks
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
