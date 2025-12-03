@@ -41,7 +41,7 @@
             </header>
 
             <!-- Content Area -->
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-6 thin-scrollbar-dark">
                 <!-- Alert Messages -->
                 @if(session('success'))
                     <div class="bg-green-900/20 border border-green-700/50 text-green-300 px-4 py-3 rounded-lg mb-6 backdrop-blur-sm">

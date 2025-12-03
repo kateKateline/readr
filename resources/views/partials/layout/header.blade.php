@@ -142,17 +142,6 @@
                                 </svg>
                                 Bookmarks
                             </a>
-
-                            <a href="{{ route('history.index') }}" 
-                               class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-[#1c2128] transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
-                                     stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-500">
-                                    <path stroke-linecap="round" stroke-linejoin="round" 
-                                          d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                History
-                            </a>
-
                             <div class="border-t border-[#21262d] my-1"></div>
 
                             <form action="{{ route('logout') }}" method="POST">

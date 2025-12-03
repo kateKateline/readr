@@ -18,7 +18,7 @@
     </div>
 
     <div class="bg-[#161b22] border border-[#21262d] rounded-lg overflow-hidden print-table-container">
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto thin-scrollbar-dark">
             <table class="w-full print-table" id="chaptersTable">
                 <thead class="bg-[#0d1117]">
                     <tr>

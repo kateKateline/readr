@@ -106,7 +106,7 @@
             <div class="border border-[#30363d] rounded-lg p-4 bg-[#0d1117]">
                 <h3 class="font-semibold text-[#c9d1d9] mb-2">INCLUDE GENRES</h3>
                 <p class="text-sm text-[#8b949e] mb-3">Only show series that match at least one selected genre.</p>
-                <div class="flex flex-wrap gap-2 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-[#30363d] scrollbar-track-[#161b22]">
+                <div class="flex flex-wrap gap-2 max-h-64 overflow-y-auto thin-scrollbar-dark">
                     @php
                         $selectedInclude = request('include_genres', []);
                     @endphp
@@ -131,7 +131,7 @@
             <div class="border border-[#30363d] rounded-lg p-4 bg-[#0d1117]">
                 <h3 class="font-semibold text-[#c9d1d9] mb-2">EXCLUDE GENRES</h3>
                 <p class="text-sm text-[#8b949e] mb-3">Hide series that contain any of these genres.</p>
-                <div class="flex flex-wrap gap-2 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-[#30363d] scrollbar-track-[#161b22]">
+                <div class="flex flex-wrap gap-2 max-h-64 overflow-y-auto thin-scrollbar-dark">
                     @php
                         $selectedExclude = request('exclude_genres', []);
                     @endphp
