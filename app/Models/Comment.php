@@ -14,13 +14,17 @@ class Comment extends Model
         'comic_id',
         'parent_id',
         'comment',
-        'is_edited'
+        'is_edited',
+        'likes_count',
+        'dislikes_count'
     ];
 
     protected $casts = [
         'is_edited' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'likes_count' => 'integer',
+        'dislikes_count' => 'integer',
     ];
 
     // Relasi dengan User

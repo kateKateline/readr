@@ -265,5 +265,79 @@
         }
     `;
         document.head.appendChild(style);
+            // --- Like / Dislike AJAX Handlers ---
+            (function setupReactionHandlers() {
+                const container = document.getElementById('comments-container');
+                if (!container) return;
+
+                // Fetch CSRF token from meta tag
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const CSRF_TOKEN = csrfMeta ? csrfMeta.getAttribute('content') : null;
+
+                async function postReaction(url) {
+                    try {
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                ...(CSRF_TOKEN ? { 'X-CSRF-TOKEN': CSRF_TOKEN } : {})
+                            },
+                            credentials: 'same-origin',
+                            body: JSON.stringify({})
+                        });
+
+                        if (res.status === 419) {
+                            // CSRF token mismatch or session expired
+                            alert('Session expired. Please refresh and try again.');
+                            return null;
+                        }
+
+                        if (!res.ok) {
+                            return null;
+                        }
+
+                        const data = await res.json();
+                        return data;
+                    } catch (err) {
+                        console.error('Reaction error', err);
+                        return null;
+                    }
+                }
+
+                function updateCountSpan(commentId, likes, dislikes) {
+                    const likeSpan = container.querySelector(`span[data-likes=\"${commentId}\"]`);
+                    const dislikeSpan = container.querySelector(`span[data-dislikes=\"${commentId}\"]`);
+                    if (likeSpan && typeof likes !== 'undefined') likeSpan.textContent = likes;
+                    if (dislikeSpan && typeof dislikes !== 'undefined') dislikeSpan.textContent = dislikes;
+                }
+
+                container.addEventListener('click', async (e) => {
+                    const likeBtn = e.target.closest('.like-btn');
+                    const dislikeBtn = e.target.closest('.dislike-btn');
+
+                    if (likeBtn) {
+                        const id = likeBtn.getAttribute('data-comment-id');
+                        if (!id) return;
+                        // POST to /comments/{id}/like
+                        const url = `/comments/${id}/like`;
+                        const data = await postReaction(url);
+                        if (data) {
+                            // Controller should return likes_count and dislikes_count
+                            updateCountSpan(id, data.likes_count ?? data.likes ?? undefined, data.dislikes_count ?? data.dislikes ?? undefined);
+                        }
+                    }
+
+                    if (dislikeBtn) {
+                        const id = dislikeBtn.getAttribute('data-comment-id');
+                        if (!id) return;
+                        const url = `/comments/${id}/dislike`;
+                        const data = await postReaction(url);
+                        if (data) {
+                            updateCountSpan(id, data.likes_count ?? data.likes ?? undefined, data.dislikes_count ?? data.dislikes ?? undefined);
+                        }
+                    }
+                });
+            })();
     </script>
 </div>

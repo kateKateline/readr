@@ -3,143 +3,152 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-6 py-12 text-[#c9d1d9]">
 
-    {{-- Header Section (Cover, Title, Tags, Synopsis, Rating, Details) --}}
-    <div class="flex flex-col md:flex-row gap-6 mb-8 p-6 bg-[#161b22] border border-[#30363d] rounded-md">
+{{-- Header Section (Cover, Title, Tags, Synopsis, Rating, Details) --}}
+<div class="flex flex-col md:flex-row gap-6 mb-8 p-6 bg-[#161b22] border border-[#30363d] rounded-md">
 
-        {{-- Cover Image --}}
-        <div class="w-full md:w-48 flex-shrink-0">
-            <img
-                src="{{ $comic->image ?? 'https://via.placeholder.com/192x288?text=Cover+Not+Found' }}"
-                alt="Cover of {{ $comic->title }}"
-                class="w-full h-auto object-cover rounded-md border border-[#30363d] aspect-[2/3]">
+    {{-- Cover Image --}}
+    <div class="w-full md:w-48 flex-shrink-0">
+        <img
+            src="{{ $comic->image ?? 'https://via.placeholder.com/192x288?text=Cover+Not+Found' }}"
+            alt="Cover of {{ $comic->title }}"
+            class="w-full h-auto object-cover rounded-md border border-[#30363d] aspect-[2/3]">
+    </div>
+
+    {{-- Title, Tags, Synopsis, Details --}}
+    <div class="flex-1 min-w-0">
+        {{-- Title, Author, & Action/Info Row (Rating & Bookmark) --}}
+        <div class="mb-4">
+            <h1 class="text-3xl font-semibold text-white break-words">{{ $comic->title }}</h1>
+            <p class="text-sm text-[#8b949e] mb-2">
+                <span class="font-medium">Author:</span> {{ $comic->author ?? 'Unknown' }}
+            </p>
+
+            {{-- **BAGIAN YANG DIREVISI: Rating dan Bookmark dibuat sejajar** --}}
+            <div class="flex items-center gap-4 mb-4 mt-2">
+                {{-- Rating Display (Lebih kecil dan disandingkan) --}}
+                <div class="flex items-center gap-1 bg-[#21262d] p-1.5 rounded-full border border-[#30363d] text-sm font-semibold">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-400">
+                        <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.1.086 1.574 1.417.757 2.138L16.42 14.07l1.373 5.263c.271 1.036-.935 1.84-1.884 1.233L12 17.25l-4.289 2.73a1.75 1.75 0 01-1.884-1.233l1.373-5.263L2.247 10.88c-.817-.721-.343-2.052.757-2.138l5.404-.433 2.082-5.006z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-white">
+                        {{ number_format($comic->rating ?? 0.0, 1) }}
+                    </span>
+                    {{-- Votes Dihilangkan Sesuai Permintaan, hanya menampilkan hitungan rating --}}
+                    <span class="text-xs text-[#8b949e]">
+                        ({{ $comic->rating_count ?? 0 }})
+                    </span>
+                </div>
+
+                {{-- Bookmark Button (dibuat lebih ringkas dan diletakkan sejajar) --}}
+                @auth
+                    @if($isBookmarked && $bookmark)
+                        <form action="{{ route('bookmarks.destroy', $bookmark->id) }}" 
+                              method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" 
+                                    class="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-400 rounded-md transition flex items-center justify-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" 
+                                     fill="currentColor" 
+                                     viewBox="0 0 24 24" 
+                                     class="w-4 h-4">
+                                    <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                </svg>
+                                Hapus Bookmark
+                            </button>
+                        </form>
+                    @else
+                        <form action="{{ route('bookmarks.store') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="comic_id" value="{{ $comic->id }}">
+                            <button type="submit" 
+                                    class="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-400 rounded-md transition flex items-center justify-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" 
+                                     fill="none" 
+                                     viewBox="0 0 24 24" 
+                                     stroke-width="2" 
+                                     stroke="currentColor" 
+                                     class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" 
+                                          d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                </svg>
+                                Tambah Bookmark
+                            </button>
+                        </form>
+                    @endif
+                @endauth
+            </div>
+            {{-- **AKHIR BAGIAN YANG DIREVISI** --}}
+
+            {{-- Genres Section (dari database) --}}
+            @php
+            $genres = !empty($comic->genre) 
+                ? array_map('trim', explode(',', $comic->genre))
+                : [];
+            $visibleGenresCount = 3;
+            @endphp
+            @if(!empty($genres))
+            <div id="tag-container" class="flex flex-wrap gap-1 mb-4">
+                @foreach ($genres as $index => $genre)
+                <span class="tag-item inline-block px-2 py-0.5 text-xs font-medium bg-[#21262d] text-[#58a6ff] rounded-full border border-[#30363d] {{ $index >= $visibleGenresCount ? 'hidden' : '' }}" data-tag-index="{{ $index }}">
+                    {{ $genre }}
+                </span>
+                @endforeach
+                @if (count($genres) > $visibleGenresCount)
+                <button id="show-more-tags" class="px-2 py-0.5 text-xs font-medium bg-[#21262d] text-[#8b949e] rounded-full border border-[#30363d] hover:text-white transition-colors">
+                    >
+                </button>
+                @endif
+            </div>
+            @endif
         </div>
 
-        {{-- Title, Tags, Synopsis, Details --}}
-        <div class="flex-1 min-w-0">
-            <div class="flex justify-between items-start mb-4">
-                {{-- Title, Author, & TAGS --}}
-                <div class="flex-1 pr-4">
-                    <h1 class="text-3xl font-semibold text-white break-words">{{ $comic->title }}</h1>
-                    <p class="text-sm text-[#8b949e] mb-2">
-                        <span class="font-medium">Author:</span> {{ $comic->author ?? 'Unknown' }}
-                    </p>
+        {{-- Sinopsis --}}
+        <div class="mb-6">
+            <h2 class="text-lg font-medium mb-1 text-white">Synopsis</h2>
+            <p class="text-[#c9d1d9] text-sm leading-relaxed text-ellipsis">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </p>
+        </div>
 
-                    {{-- Genres Section (from database) --}}
-                    @php
-                    $genres = !empty($comic->genre) 
-                        ? array_map('trim', explode(',', $comic->genre))
-                        : [];
-                    $visibleGenresCount = 3;
-                    @endphp
-                    @if(!empty($genres))
-                    <div id="tag-container" class="flex flex-wrap gap-1 mb-4">
-                        @foreach ($genres as $index => $genre)
-                        <span class="tag-item inline-block px-2 py-0.5 text-xs font-medium bg-[#21262d] text-[#58a6ff] rounded-full border border-[#30363d] {{ $index >= $visibleGenresCount ? 'hidden' : '' }}" data-tag-index="{{ $index }}">
-                            {{ $genre }}
-                        </span>
-                        @endforeach
-                        @if (count($genres) > $visibleGenresCount)
-                        <button id="show-more-tags" class="px-2 py-0.5 text-xs font-medium bg-[#21262d] text-[#8b949e] rounded-full border border-[#30363d] hover:text-white transition-colors">
-                            >
-                        </button>
-                        @endif
-                    </div>
-                    @endif
-                </div>
-
-                {{-- Rating & Bookmark --}}
-                <div class="flex-shrink-0 text-center ml-4 space-y-3">
-                    <div class="w-14 h-14 rounded-full bg-green-600 flex items-center justify-center border-2 border-green-400">
-                        <span class="text-xl font-bold text-white">
-                            {{ number_format($comic->rating ?? 0.0, 1) }}
-                        </span>
-                    </div>
-                    <p class="text-xs text-[#8b949e] mt-1">{{ $comic->rating_count ?? 0 }} Votes</p>
-                    
-                    {{-- Bookmark Button --}}
-                    @auth
-                        @if($isBookmarked && $bookmark)
-                            <form action="{{ route('bookmarks.destroy', $bookmark->id) }}" 
-                                  method="POST" 
-                                  class="mt-3">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" 
-                                        class="w-full px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-400 rounded-md transition flex items-center justify-center gap-2 text-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" 
-                                         fill="currentColor" 
-                                         viewBox="0 0 24 24" 
-                                         class="w-4 h-4">
-                                        <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-                                    </svg>
-                                    Hapus Bookmark
-                                </button>
-                            </form>
-                        @else
-                            <form action="{{ route('bookmarks.store') }}" method="POST" class="mt-3">
-                                @csrf
-                                <input type="hidden" name="comic_id" value="{{ $comic->id }}">
-                                <button type="submit" 
-                                        class="w-full px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-400 rounded-md transition flex items-center justify-center gap-2 text-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" 
-                                         fill="none" 
-                                         viewBox="0 0 24 24" 
-                                         stroke-width="2" 
-                                         stroke="currentColor" 
-                                         class="w-4 h-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" 
-                                              d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-                                    </svg>
-                                    Tambah Bookmark
-                                </button>
-                            </form>
-                        @endif
-                    @endauth
-                </div>
-            </div>
-
-            {{-- Sinopsis --}}
-            <div class="mb-6">
-                <h2 class="text-lg font-medium mb-1 text-white">Synopsis</h2>
-                <p class="text-[#c9d1d9] text-sm leading-relaxed text-ellipsis">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                </p>
-            </div>
-
-            {{-- Details Section (Status, Type, Released, Timestamps) --}}
-            <div class="grid grid-cols-2 gap-y-1 gap-x-4 text-sm">
-                <p class="text-[#8b949e]"><span class="font-medium text-white">Status:</span> {{ $comic->status ?? 'N/A' }}</p>
-                <p class="text-[#8b949e]"><span class="font-medium text-white">Type:</span> {{ $comic->type ?? 'N/A' }}</p>
-                <p class="text-[#8b949e]"><span class="font-medium text-white">Released:</span> {{ \Carbon\Carbon::parse($comic->created_at)->year ?? 'N/A' }}</p>
-                <p class="text-[#8b949e]"><span class="font-medium text-white">Updated At:</span> {{ $comic->last_update ? \Carbon\Carbon::parse($comic->last_update)->diffForHumans() : 'N/A' }}</p>
-                <p class="text-[#8b949e]"><span class="font-medium text-white">Added At:</span> {{ $comic->created_at ? \Carbon\Carbon::parse($comic->created_at)->diffForHumans() : 'N/A' }}</p>
-            </div>
+        {{-- Details Section (Status, Type, Released, Timestamps) --}}
+        <div class="grid grid-cols-2 gap-y-1 gap-x-4 text-sm">
+            <p class="text-[#8b949e]"><span class="font-medium text-white">Status:</span> {{ $comic->status ?? 'N/A' }}</p>
+            <p class="text-[#8b949e]"><span class="font-medium text-white">Type:</span> {{ $comic->type ?? 'N/A' }}</p>
+            <p class="text-[#8b949e]"><span class="font-medium text-white">Released:</span> {{ \Carbon\Carbon::parse($comic->created_at)->year ?? 'N/A' }}</p>
+            <p class="text-[#8b949e]"><span class="font-medium text-white">Updated At:</span> {{ $comic->last_update ? \Carbon\Carbon::parse($comic->last_update)->diffForHumans() : 'N/A' }}</p>
+            <p class="text-[#8b949e]"><span class="font-medium text-white">Added At:</span> {{ $comic->created_at ? \Carbon\Carbon::parse($comic->created_at)->diffForHumans() : 'N/A' }}</p>
         </div>
     </div>
+</div>
 
     {{-- Chapter List Section --}}
     <div class="bg-[#161b22] border border-[#30363d] rounded-md">
 
-        {{-- Language Tabs (Sort By Dihapus) --}}
-        <div class="flex justify-start border-b border-b-[#30363d] px-6 pt-4 pb-0 overflow-x-auto whitespace-nowrap">
-            <nav class="flex space-x-2 flex-shrink-0" role="tablist">
-                @foreach ($availableLanguages as $lang)
-                <button
-                    id="tab-{{ $lang }}"
-                    data-lang="{{ $lang }}"
-                    class="tab-btn py-2 px-4 text-sm font-medium border-b-2
-                    {{ $lang === $defaultLanguage ? 'border-blue-500 text-white' : 'border-transparent text-[#8b949e] hover:text-white hover:border-[#8b949e]' }}
-                    focus:outline-none transition-colors duration-150"
-                    role="tab"
-                    aria-controls="panel-{{ $lang }}"
-                    aria-selected="{{ $lang === $defaultLanguage ? 'true' : 'false' }}">
-                    {{ $languageLabels[$lang] }} ({{ $chaptersByLanguage[$lang]->count() }})
-                </button>
-                @endforeach
-            </nav>
+{{-- Language Tabs (Sort By Dihapus) --}}
+<div class="flex justify-start border-b border-b-[#30363d] px-6 pt-4 pb-0 
+            overflow-x-auto overflow-y-hidden thin-scrollbar-dark whitespace-nowrap">
 
-            {{-- Bagian Sort By Dihapus --}}
-        </div>
+    <nav class="flex space-x-2 flex-shrink-0" role="tablist">
+        @foreach ($availableLanguages as $lang)
+            <button
+                id="tab-{{ $lang }}"
+                data-lang="{{ $lang }}"
+                class="tab-btn py-2 px-4 text-sm font-medium border-b-2
+                {{ $lang === $defaultLanguage
+                    ? 'border-blue-500 text-white'
+                    : 'border-transparent text-[#8b949e] hover:text-white hover:border-[#8b949e]' }}
+                focus:outline-none transition-colors duration-150"
+                role="tab"
+                aria-controls="panel-{{ $lang }}"
+                aria-selected="{{ $lang === $defaultLanguage ? 'true' : 'false' }}">
+                {{ $languageLabels[$lang] }} ({{ $chaptersByLanguage[$lang]->count() }})
+            </button>
+        @endforeach
+    </nav>
+
+</div>
+
 
         {{-- Chapter Content --}}
         <div class="p-4">

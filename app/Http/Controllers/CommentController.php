@@ -61,4 +61,41 @@ class CommentController extends Controller
 
         return redirect()->back()->with('success', 'Comment berhasil dihapus!');
     }
+
+    /**
+     * Increment likes_count for a comment.
+     */
+    public function like(Request $request, Comment $comment)
+    {
+        // Simple increment (no per-user limitations implemented)
+        $comment->increment('likes_count');
+        $comment->refresh();
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'likes' => (int) $comment->likes_count,
+                'dislikes' => (int) $comment->dislikes_count,
+            ]);
+        }
+
+        return redirect()->back();
+    }
+
+    /**
+     * Increment dislikes_count for a comment.
+     */
+    public function dislike(Request $request, Comment $comment)
+    {
+        $comment->increment('dislikes_count');
+        $comment->refresh();
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'likes' => (int) $comment->likes_count,
+                'dislikes' => (int) $comment->dislikes_count,
+            ]);
+        }
+
+        return redirect()->back();
+    }
 }
